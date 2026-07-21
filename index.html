@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bufete Casal — Gestión Interna</title>
+<style>
+  :root{
+    --navy:#1e293b;
+    --navy-dark:#0f172a;
+    --gold:#b8860b;
+  }
+  body{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background:#f4f5f7; }
+  ::-webkit-scrollbar{ width:8px; height:8px; }
+  ::-webkit-scrollbar-thumb{ background:#cbd5e1; border-radius:4px; }
+  .sidebar-link.active{ background:#334155; color:#fff; border-left-color:#b8860b; }
+  .sidebar-link{ border-left:3px solid transparent; }
+  .badge{ display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:9999px; font-size:11px; font-weight:600; white-space:nowrap; }
+  .badge-red{ background:#fee2e2; color:#b91c1c; }
+  .badge-orange{ background:#ffedd5; color:#c2410c; }
+  .badge-yellow{ background:#fef9c3; color:#a16207; }
+  .badge-gray{ background:#f1f5f9; color:#475569; }
+  .badge-green{ background:#dcfce7; color:#15803d; }
+  .badge-blue{ background:#dbeafe; color:#1d4ed8; }
+  .card{ background:#fff; border:1px solid #e5e7eb; border-radius:10px; }
+  table.tbl{ width:100%; border-collapse:collapse; font-size:13px; }
+  table.tbl th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.03em; color:#64748b; padding:8px 10px; border-bottom:2px solid #e5e7eb; white-space:nowrap; }
+  table.tbl td{ padding:8px 10px; border-bottom:1px solid #eef1f4; vertical-align:middle; }
+  table.tbl tbody tr:hover{ background:#f8fafc; }
+  .btn{ display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; border:1px solid transparent; transition:.12s; white-space:nowrap; }
+  .btn-primary{ background:var(--navy); color:#fff; } .btn-primary:hover{ background:var(--navy-dark); }
+  .btn-gold{ background:#b8860b; color:#fff; } .btn-gold:hover{ background:#96700a; }
+  .btn-outline{ background:#fff; border-color:#cbd5e1; color:#334155; } .btn-outline:hover{ background:#f1f5f9; }
+  .btn-danger{ background:#fff; border-color:#fecaca; color:#b91c1c; } .btn-danger:hover{ background:#fef2f2; }
+  .btn-sm{ padding:4px 9px; font-size:12px; }
+  input[type=text],input[type=number],input[type=date],input[type=email],input[type=tel],input[type=month],input[type=file],select,textarea{
+    width:100%; border:1px solid #cbd5e1; border-radius:7px; padding:7px 10px; font-size:13px; background:#fff;
+  }
+  input:focus,select:focus,textarea:focus{ outline:2px solid #b8860b33; border-color:#b8860b; }
+  label.field-label{ font-size:12px; font-weight:600; color:#475569; margin-bottom:3px; display:block; }
+  .modal-backdrop{ position:fixed; inset:0; background:rgba(15,23,42,.55); display:flex; align-items:flex-start; justify-content:center; padding:30px 14px; overflow-y:auto; z-index:100; }
+  .modal-box{ background:#fff; border-radius:12px; width:100%; max-width:640px; box-shadow:0 20px 60px rgba(0,0,0,.3); }
+  .kanban-col{ background:#eef1f5; border-radius:10px; min-width:250px; max-width:250px; display:flex; flex-direction:column; max-height:calc(100vh - 230px); }
+  .kanban-card{ background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:8px; cursor:grab; box-shadow:0 1px 2px rgba(0,0,0,.05); }
+  .kanban-card.dragging{ opacity:.4; }
+  .kanban-col.drag-over{ background:#dde3ea; }
+  .stat-tile{ background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px; }
+  @media print{ #sidebar,#topbar,.no-print{ display:none !important; } #app{ margin:0 !important; } }
+
+  /* =========================================================
+     UTILIDADES (sustituyen a un framework externo vía CDN:
+     todo el CSS necesario vive en este archivo, sin llamadas
+     de red en tiempo de ejecución)
+  ========================================================= */
+  .flex{display:flex} .flex-1{flex:1 1 0%} .flex-wrap{flex-wrap:wrap}
+  .grid{display:grid}
+  .grid-cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}
+  .grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grid-cols-7{grid-template-columns:repeat(7,minmax(0,1fr))}
+  .col-span-2{grid-column:span 2 / span 2} .col-span-full{grid-column:1 / -1}
+  .items-center{align-items:center} .items-end{align-items:flex-end} .items-start{align-items:flex-start}
+  .justify-between{justify-content:space-between} .justify-end{justify-content:flex-end}
+  .block{display:block} .inline-block{display:inline-block} .hidden{display:none}
+  .relative{position:relative} .fixed{position:fixed}
+  .overflow-hidden{overflow:hidden} .overflow-x-auto{overflow-x:auto} .overflow-y-auto{overflow-y:auto}
+  .shrink-0{flex-shrink:0}
+  .top-0{top:0} .top-14{top:3.5rem} .left-0{left:0} .right-0{right:0} .right-4{right:1rem} .bottom-0{bottom:0} .bottom-4{bottom:1rem}
+  .min-h-screen{min-height:100vh} .min-h-\[90px\]{min-height:90px}
+  .max-h-80{max-height:20rem} .max-w-sm{max-width:24rem} .max-w-\[220px\]{max-width:220px}
+  .min-w-0{min-width:0} .min-w-\[140px\]{min-width:140px} .min-w-\[150px\]{min-width:150px} .min-w-\[160px\]{min-width:160px} .min-w-\[180px\]{min-width:180px}
+  .w-32{width:8rem} .w-56{width:14rem} .w-full{width:100%} .h-14{height:3.5rem} .h-auto{height:auto}
+  .z-30{z-index:30} .z-40{z-index:40} .z-\[200\]{z-index:200}
+  .-translate-x-full{transform:translateX(-100%)}
+
+  .p-1{padding:.25rem} .p-2{padding:.5rem} .p-3{padding:.75rem} .p-4{padding:1rem} .p-5{padding:1.25rem} .p-6{padding:1.5rem}
+  .px-2{padding-left:.5rem;padding-right:.5rem} .px-3{padding-left:.75rem;padding-right:.75rem} .px-4{padding-left:1rem;padding-right:1rem} .px-5{padding-left:1.25rem;padding-right:1.25rem}
+  .py-1{padding-top:.25rem;padding-bottom:.25rem} .py-2{padding-top:.5rem;padding-bottom:.5rem} .py-2\.5{padding-top:.625rem;padding-bottom:.625rem}
+  .py-3{padding-top:.75rem;padding-bottom:.75rem} .py-4{padding-top:1rem;padding-bottom:1rem} .py-6{padding-top:1.5rem;padding-bottom:1.5rem}
+  .pt-2{padding-top:.5rem} .pt-14{padding-top:3.5rem} .pb-2{padding-bottom:.5rem}
+  .mb-1{margin-bottom:.25rem} .mb-2{margin-bottom:.5rem} .mb-3{margin-bottom:.75rem} .mb-4{margin-bottom:1rem} .mb-5{margin-bottom:1.25rem} .mb-6{margin-bottom:1.5rem}
+  .mt-1{margin-top:.25rem} .mt-2{margin-top:.5rem} .mt-4{margin-top:1rem} .ml-1{margin-left:.25rem} .my-3{margin-top:.75rem;margin-bottom:.75rem}
+  .gap-1{gap:.25rem} .gap-2{gap:.5rem} .gap-3{gap:.75rem} .gap-4{gap:1rem} .gap-px{gap:1px}
+  .space-y-0\.5>*+*{margin-top:.125rem} .space-y-1>*+*{margin-top:.25rem} .space-y-2>*+*{margin-top:.5rem} .space-y-3>*+*{margin-top:.75rem}
+
+  .text-xs{font-size:.75rem;line-height:1rem} .text-sm{font-size:.8125rem;line-height:1.25rem} .text-lg{font-size:1.125rem;line-height:1.5rem}
+  .text-xl{font-size:1.25rem;line-height:1.75rem} .text-2xl{font-size:1.5rem;line-height:2rem}
+  .text-\[10px\]{font-size:10px} .text-\[15px\]{font-size:15px}
+  .font-bold{font-weight:700} .font-semibold{font-weight:600} .font-medium{font-weight:500} .font-normal{font-weight:400}
+  .tracking-wide{letter-spacing:.025em} .text-left{text-align:left} .text-center{text-align:center} .text-right{text-align:right}
+  .truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .whitespace-pre-line{white-space:pre-line}
+  .leading-none{line-height:1} .align-middle{vertical-align:middle} .align-top{vertical-align:top} .align-bottom{vertical-align:bottom}
+  .line-through{text-decoration:line-through} .underline{text-decoration:underline}
+
+  .text-white{color:#fff} .text-white\/80{color:rgba(255,255,255,.8)}
+  .text-slate-200{color:#e2e8f0} .text-slate-300{color:#cbd5e1} .text-slate-400{color:#94a3b8} .text-slate-500{color:#64748b}
+  .text-slate-600{color:#475569} .text-slate-700{color:#334155} .text-slate-800{color:#1e293b}
+  .text-red-400{color:#f87171} .text-red-600{color:#dc2626} .text-green-700{color:#15803d} .text-blue-600{color:#2563eb}
+  .text-\[\#b8860b\]{color:#b8860b}
+  .bg-white{background:#fff} .bg-slate-50{background:#f8fafc} .bg-slate-100{background:#f1f5f9} .bg-slate-900{background:#0f172a}
+  .bg-\[\#0f172a\]{background:#0f172a} .bg-\[\#1e293b\]{background:#1e293b} .bg-yellow-50{background:#fefce8}
+  .border{border-width:1px;border-style:solid;border-color:#e5e7eb} .border-t{border-top:1px solid #e5e7eb} .border-b{border-bottom:1px solid #e5e7eb}
+  .border-slate-50{border-color:#f8fafc} .border-slate-100{border-color:#f1f5f9} .border-slate-300{border-color:#cbd5e1} .border-slate-700{border-color:#334155}
+
+  .rounded-lg{border-radius:.5rem}
+  .shadow-lg{box-shadow:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1)}
+  .transition{transition:all .15s ease} .transition-transform{transition:transform .15s ease}
+  .hover\:shadow-md:hover{box-shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.1)}
+  .hover\:bg-slate-50:hover{background:#f8fafc} .hover\:bg-slate-700:hover{background:#334155} .hover\:bg-slate-800:hover{background:#1e293b}
+  .hover\:text-red-500:hover{color:#ef4444} .hover\:text-slate-700:hover{color:#334155} .hover\:text-slate-800:hover{color:#1e293b}
+  .hover\:text-\[\#b8860b\]:hover{color:#b8860b} .hover\:underline:hover{text-decoration:underline}
+  .group:hover .group-hover\:inline{display:inline}
+
+  .\!bg-transparent{background:transparent!important} .\!text-white{color:#fff!important}
+  .\!border-slate-600{border-color:#475569!important} .\!text-slate-300{color:#cbd5e1!important} .\!border-0{border-width:0!important}
+  .hover\:\!bg-slate-800:hover{background:#1e293b!important}
+
+  @media (min-width:640px){ .sm\:inline{display:inline} }
+  @media (min-width:768px){
+    .md\:hidden{display:none} .md\:ml-56{margin-left:14rem} .md\:p-6{padding:1.5rem} .md\:translate-x-0{transform:translateX(0)}
+    .md\:col-span-2{grid-column:span 2 / span 2}
+    .md\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))} .md\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))} .md\:grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+  }
+  @media (min-width:1024px){
+    .lg\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))} .lg\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))} .lg\:grid-cols-6{grid-template-columns:repeat(6,minmax(0,1fr))}
+  }
+  @media (min-width:1280px){
+    .xl\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  }
+</style>
+</head>
+<body class="text-slate-800">
+
+<div id="topbar" class="fixed top-0 left-0 right-0 h-14 bg-[#0f172a] text-white flex items-center justify-between px-4 z-40">
+  <div class="flex items-center gap-3">
+    <button id="btnBurger" class="md:hidden text-white/80"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <span class="font-bold tracking-wide text-[15px]">⚖ Bufete Casal</span>
+    <span class="hidden sm:inline text-xs text-slate-400">Gestión Interna</span>
+  </div>
+  <div class="flex items-center gap-2">
+    <button data-action="backup-export" class="btn btn-outline btn-sm !bg-transparent !text-white !border-slate-600 hover:!bg-slate-800">Exportar backup</button>
+    <button data-action="backup-import" class="btn btn-outline btn-sm !bg-transparent !text-white !border-slate-600 hover:!bg-slate-800">Importar backup</button>
+    <input type="file" id="importFile" accept="application/json" class="hidden">
+  </div>
+</div>
+
+<aside id="sidebar" class="fixed top-14 left-0 bottom-0 w-56 bg-[#1e293b] text-slate-200 overflow-y-auto -translate-x-full md:translate-x-0 transition-transform z-30">
+  <nav id="navLinks" class="py-3"></nav>
+  <div class="px-3 py-3 mt-2 border-t border-slate-700 text-xs text-slate-400">
+    <button data-action="seed-reset" class="btn btn-outline btn-sm w-full !bg-transparent !text-slate-300 !border-slate-600 hover:!bg-slate-800">Vaciar datos de ejemplo</button>
+  </div>
+</aside>
+
+<main id="app" class="pt-14 md:ml-56 min-h-screen p-4 md:p-6"></main>
+<div id="modalRoot"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* =========================================================
+   UTILIDADES
+========================================================= */
+const $ = (sel, ctx) => (ctx||document).querySelector(sel);
+const $$ = (sel, ctx) => Array.from((ctx||document).querySelectorAll(sel));
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : 'id-'+Date.now()+'-'+Math.random().toString(16).slice(2));
+const todayISO = () => new Date().toISOString().slice(0,10);
+const addDays = (n, base) => { const d = base? new Date(base): new Date(); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); };
+const addMonthsStr = (n, base) => { const d = base? new Date(base): new Date(); d.setMonth(d.getMonth()+n); return d.toISOString().slice(0,10); };
+const monthKey = (dateStr) => (dateStr||'').slice(0,7);
+const esc = (s) => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function fmtDate(iso){ if(!iso) return '—'; const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`; }
+function fmtMoney(n){ n = Number(n)||0; return n.toLocaleString('es-ES',{style:'currency',currency:'EUR'}); }
+function daysLeft(iso){ if(!iso) return null; const d = new Date(iso+'T00:00:00'); const t = new Date(); t.setHours(0,0,0,0); return Math.round((d-t)/86400000); }
+function urgency(iso, doneFlag){
+  if(doneFlag) return {cls:'badge-green', label:'Cumplido'};
+  if(!iso) return {cls:'badge-gray', label:'Sin fecha'};
+  const dl = daysLeft(iso);
+  if(dl < 0) return {cls:'badge-red', label:`Vencido (${Math.abs(dl)}d)`};
+  if(dl <= 7) return {cls:'badge-red', label:`${dl}d — Urgente`};
+  if(dl <= 15) return {cls:'badge-orange', label:`${dl}d — Próximo`};
+  if(dl <= 30) return {cls:'badge-yellow', label:`${dl}d`};
+  return {cls:'badge-gray', label:fmtDate(iso)};
+}
+function badge(u){ return `<span class="badge ${u.cls}">${esc(u.label)}</span>`; }
+function el(html){ const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstElementChild; }
+function toast(msg){
+  const t = el(`<div class="fixed bottom-4 right-4 bg-slate-900 text-white text-sm px-4 py-2 rounded-lg shadow-lg z-[200]">${esc(msg)}</div>`);
+  document.body.appendChild(t); setTimeout(()=>t.remove(), 2200);
+}
+function confirmAction(msg){ return window.confirm(msg); }
+
+/* =========================================================
+   BASE DE DATOS (localStorage)
+========================================================= */
+const STORAGE_KEY = 'bufete_casal_db_v1';
+
+const DB = {
+  load(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw) return JSON.parse(raw);
+    }catch(e){ console.error('Error leyendo DB', e); }
+    return null;
+  },
+  save(state){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  },
+  empty(){
+    return {
+      version: 1,
+      clients: [],
+      cases: [],
+      properties: [],
+      contracts: [],
+      payments: [],
+      events: [],
+      documents: [],
+      matterTypes: ['Civil','Mercantil','Laboral','Herencias','Arrendamientos','Penal','Administrativo','Familia'],
+      pipelineStages: ['Nuevo','En estudio','En trámite','Pendiente resolución','Resuelto','Archivado'],
+      lawyers: ['Ana López','Carlos Ruiz','Marta Sanz'],
+    };
+  },
+  seed(){
+    const s = DB.empty();
+    // ---- Clientes ----
+    const c1 = {id: uid(), name:'María Fernández', taxId:'12345678A', type:'particular', email:'maria.fernandez@example.com', phone:'611 222 333', address:'C/ Alcalá 45, Madrid', notes:'Cliente desde 2019. Prefiere contacto por email.'};
+    const c2 = {id: uid(), name:'Distribuciones Ibérica S.L.', taxId:'B12345678', type:'empresa', email:'admin@distribuicberica.es', phone:'910 111 222', address:'Pol. Ind. Norte, Nave 4, Alcobendas', notes:'Cliente corporativo, varios inmuebles en cartera.'};
+    const c3 = {id: uid(), name:'Juan Pérez', taxId:'87654321B', type:'particular', email:'juanperez@example.com', phone:'622 333 444', address:'Av. de América 10, Madrid', notes:''};
+    const c4 = {id: uid(), name:'Constructora Delta S.A.', taxId:'A87654321', type:'empresa', email:'legal@constructoradelta.es', phone:'913 555 666', address:'Paseo de la Castellana 200, Madrid', notes:'Requiere informes trimestrales.'};
+    s.clients.push(c1,c2,c3,c4);
+
+    // ---- Expedientes ----
+    const cases = [
+      {id:uid(), ref:'EXP-2026-001', clientId:c1.id, matterType:'Herencias', lawyer:'Ana López', openDate: addDays(-120), description:'Reparto de herencia entre hermanos, disputa por vivienda familiar.', fees: 1800, status:'En trámite',
+        milestones:[
+          {id:uid(), title:'Presentación de inventario', dueDate: addDays(5), done:false},
+          {id:uid(), title:'Vista en juzgado', dueDate: addDays(28), done:false},
+        ],
+        log:[
+          {id:uid(), date: addDays(-100), text:'Primera reunión con la clienta, recopilación de documentación.'},
+          {id:uid(), date: addDays(-40), text:'Presentado escrito de demanda de división de herencia.'},
+        ]},
+      {id:uid(), ref:'EXP-2026-002', clientId:c2.id, matterType:'Mercantil', lawyer:'Carlos Ruiz', openDate: addDays(-60), description:'Reclamación de cantidad a proveedor por incumplimiento de contrato.', fees: 3200, status:'Nuevo',
+        milestones:[ {id:uid(), title:'Enviar burofax de requerimiento', dueDate: addDays(2), done:false} ],
+        log:[ {id:uid(), date: addDays(-5), text:'Recibida documentación contractual del cliente.'} ]},
+      {id:uid(), ref:'EXP-2026-003', clientId:c3.id, matterType:'Laboral', lawyer:'Marta Sanz', openDate: addDays(-200), description:'Despido improcedente, reclamación de indemnización.', fees: 1200, status:'Resuelto',
+        milestones:[ {id:uid(), title:'Firma de acuerdo de conciliación', dueDate: addDays(-30), done:true} ],
+        log:[ {id:uid(), date: addDays(-30), text:'Alcanzado acuerdo de conciliación con la empresa. Expediente resuelto.'} ]},
+      {id:uid(), ref:'EXP-2026-004', clientId:c4.id, matterType:'Administrativo', lawyer:'Ana López', openDate: addDays(-15), description:'Recurso contra denegación de licencia de obra.', fees: 2500, status:'En estudio',
+        milestones:[ {id:uid(), title:'Plazo de recurso de alzada', dueDate: addDays(12), done:false} ],
+        log:[ {id:uid(), date: addDays(-15), text:'Apertura de expediente. Análisis de la resolución administrativa.'} ]},
+      {id:uid(), ref:'EXP-2026-005', clientId:c2.id, matterType:'Arrendamientos', lawyer:'Carlos Ruiz', openDate: addDays(-8), description:'Redacción y revisión de nuevo contrato de arrendamiento local comercial.', fees: 600, status:'Pendiente resolución',
+        milestones:[ {id:uid(), title:'Firma del contrato', dueDate: addDays(20), done:false} ],
+        log:[]},
+      {id:uid(), ref:'EXP-2026-006', clientId:c1.id, matterType:'Civil', lawyer:'Marta Sanz', openDate: addDays(-400), description:'Reclamación por daños en comunidad de propietarios.', fees: 900, status:'Archivado',
+        milestones:[], log:[ {id:uid(), date: addDays(-380), text:'Expediente archivado por desistimiento del cliente.'} ]},
+      {id:uid(), ref:'EXP-2026-007', clientId:c4.id, matterType:'Civil', lawyer:'Ana López', openDate: addDays(-3), description:'Consulta previa sobre servidumbre de paso.', fees: 0, status:'Nuevo',
+        milestones:[ {id:uid(), title:'Enviar propuesta de honorarios', dueDate: addDays(-1), done:false} ],
+        log:[]},
+    ];
+    s.cases.push(...cases);
+
+    // ---- Inmuebles ----
+    const p1 = {id:uid(), clientId:c2.id, address:'Local comercial, Gran Vía 12, Madrid', cadastralRef:'9872304VK4797S0001AB', type:'Local comercial', area:120, notes:'Escaparate a calle, muy buena ubicación.'};
+    const p2 = {id:uid(), clientId:c1.id, address:'Piso 3ºB, Calle Mayor 5, Madrid', cadastralRef:'', type:'Vivienda', area:85, notes:'Reformado en 2022.'};
+    const p3 = {id:uid(), clientId:c4.id, address:'Nave industrial, Polígono Sur, Getafe', cadastralRef:'4455102VK4745N0001XY', type:'Nave industrial', area:800, notes:'Incluye oficinas anexas.'};
+    s.properties.push(p1,p2,p3);
+
+    // ---- Contratos ----
+    const ct1 = {id:uid(), propertyId:p1.id, tenant:'Cafetería Aroma S.L.', startDate: addDays(-500), endDate: addDays(18), renewalDate: addDays(18), rentAmount: 1450, deposit: 2900, expenses:'Comunidad a cargo del arrendatario. IBI a cargo del propietario.', ipcNotes:'Revisión anual según IPC cada aniversario del contrato.', notes:'Contrato con opción de renovación por 3 años.', status:'Activo'};
+    const ct2 = {id:uid(), propertyId:p2.id, tenant:'David Molina Ortega', startDate: addDays(-200), endDate: addDays(165), renewalDate: addDays(165), rentAmount: 950, deposit: 950, expenses:'Suministros a cargo del inquilino.', ipcNotes:'Sin revisión IPC el primer año.', notes:'', status:'Activo'};
+    const ct3 = {id:uid(), propertyId:p3.id, tenant:'Logística Rápida S.A.', startDate: addDays(-900), endDate: addDays(6), renewalDate: addDays(6), rentAmount: 4200, deposit: 8400, expenses:'Mantenimiento de instalaciones a cargo del arrendatario.', ipcNotes:'Revisión IPC aplicada en el último aniversario (+2,1%).', notes:'Pendiente de negociar renovación.', status:'Activo'};
+    s.contracts.push(ct1,ct2,ct3);
+
+    // ---- Pagos (histórico varios meses) ----
+    function genPayments(contract, months, methods){
+      const out = [];
+      for(let i=months; i>=0; i--){
+        const period = addMonthsStr(-i).slice(0,7);
+        const expectedDate = period+'-05';
+        let status = 'Cobrado', paidDate = period+'-0'+(3+ (i%5)), paidAmount = contract.rentAmount;
+        if(i===2){ status='Impago'; paidDate=''; paidAmount=0; }
+        else if(i===0){ status='Pendiente'; paidDate=''; paidAmount=0; }
+        out.push({id:uid(), contractId:contract.id, period, expectedAmount:contract.rentAmount, expectedDate, paidAmount, paidDate, method: status==='Cobrado'? methods[i%methods.length] : '', status, notes: status==='Impago' ? 'Impago reclamado, en seguimiento.' : ''});
+      }
+      return out;
+    }
+    s.payments.push(...genPayments(ct1, 6, ['Transferencia','Domiciliación']));
+    s.payments.push(...genPayments(ct2, 5, ['Transferencia']));
+    s.payments.push(...genPayments(ct3, 7, ['Transferencia','Domiciliación','Cheque']));
+
+    // ---- Eventos manuales ----
+    s.events.push(
+      {id:uid(), date: addDays(3), title:'Reunión con María Fernández', notes:'Revisión del reparto de herencia.'},
+      {id:uid(), date: addDays(10), title:'Comida con Constructora Delta', notes:'Seguimiento de expedientes abiertos.'},
+      {id:uid(), date: addDays(-2), title:'Auditoría interna de expedientes', notes:''}
+    );
+
+    // ---- Documentos ----
+    s.documents.push(
+      {id:uid(), relatedType:'case', relatedId:cases[0].id, name:'Testamento original (escaneado)', url:'https://example.com/docs/testamento.pdf', notes:'', createdAt: addDays(-90)},
+      {id:uid(), relatedType:'client', relatedId:c2.id, name:'Escritura de constitución', url:'https://example.com/docs/escritura.pdf', notes:'', createdAt: addDays(-300)},
+      {id:uid(), relatedType:'property', relatedId:p1.id, name:'Nota simple registral', url:'https://example.com/docs/nota-simple.pdf', notes:'', createdAt: addDays(-500)}
+    );
+
+    return s;
+  },
+  exportJSON(state){
+    const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `bufete-casal-backup-${todayISO()}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+  }
+};
+
+let state = DB.load();
+let freshInstall = false;
+if(!state){ state = DB.seed(); DB.save(state); freshInstall = true; }
+// Migración defensiva por si faltan colecciones en backups antiguos
+Object.assign(state, Object.assign(DB.empty(), state));
+
+function persist(){ DB.save(state); }
+function mutate(fn){ fn(state); persist(); render(); }
+
+/* =========================================================
+   LOOKUPS
+========================================================= */
+const clientById = id => state.clients.find(c=>c.id===id);
+const caseById = id => state.cases.find(c=>c.id===id);
+const propertyById = id => state.properties.find(p=>p.id===id);
+const contractById = id => state.contracts.find(c=>c.id===id);
+function clientName(id){ const c = clientById(id); return c? c.name : '—'; }
+function propertyLabel(id){ const p = propertyById(id); return p? p.address : '—'; }
+function casesOfClient(id){ return state.cases.filter(c=>c.clientId===id); }
+function propertiesOfClient(id){ return state.properties.filter(p=>p.clientId===id); }
+function contractsOfProperty(id){ return state.contracts.filter(c=>c.propertyId===id); }
+function paymentsOfContract(id){ return state.payments.filter(p=>p.contractId===id).sort((a,b)=> a.period<b.period?1:-1); }
+function activeContractOf(propId){ return contractsOfProperty(propId).find(c=>c.status==='Activo'); }
+
+function allUpcomingDeadlines(daysWindow){
+  const items = [];
+  state.cases.forEach(c=>{
+    (c.milestones||[]).forEach(m=>{
+      if(m.done) return;
+      const dl = daysLeft(m.dueDate);
+      if(dl!==null && dl<=daysWindow){
+        items.push({kind:'Expediente', kindColor:'badge-blue', refLabel:c.ref, title:m.title, date:m.dueDate, dl, link:`#/expedientes/${c.id}`, entityName: clientName(c.clientId)});
+      }
+    });
+  });
+  state.contracts.forEach(ct=>{
+    if(ct.status!=='Activo') return;
+    const dateRef = ct.renewalDate || ct.endDate;
+    const dl = daysLeft(dateRef);
+    if(dl!==null && dl<=daysWindow){
+      items.push({kind:'Alquiler', kindColor:'badge-gold', refLabel: propertyLabel(ct.propertyId), title:`Vencimiento contrato — ${ct.tenant}`, date:dateRef, dl, link:`#/contratos/${ct.id}`, entityName: ct.tenant});
+    }
+  });
+  return items.sort((a,b)=>a.dl-b.dl);
+}
+
+/* =========================================================
+   MODAL
+========================================================= */
+function openModal(title, bodyHtml, opts){
+  opts = opts || {};
+  closeModal();
+  const root = $('#modalRoot');
+  const box = el(`
+    <div class="modal-backdrop" id="modalBackdrop">
+      <div class="modal-box">
+        <div class="flex items-center justify-between px-5 py-4 border-b">
+          <h3 class="font-bold text-slate-800">${esc(title)}</h3>
+          <button data-action="modal-close" class="text-slate-400 hover:text-slate-700 text-xl leading-none">&times;</button>
+        </div>
+        <div class="p-5">${bodyHtml}</div>
+      </div>
+    </div>`);
+  root.appendChild(box);
+  box.addEventListener('mousedown', (e)=>{ if(e.target.id==='modalBackdrop') closeModal(); });
+  if(opts.onMount) opts.onMount(box);
+}
+function closeModal(){ $('#modalRoot').innerHTML=''; }
+
+/* =========================================================
+   NAVEGACIÓN / ROUTER
+========================================================= */
+const NAV = [
+  {hash:'#/dashboard', label:'Dashboard', icon:'📊'},
+  {hash:'#/clientes', label:'Clientes', icon:'👤'},
+  {hash:'#/expedientes', label:'Expedientes', icon:'📁'},
+  {hash:'#/inmuebles', label:'Inmuebles y Alquileres', icon:'🏢'},
+  {hash:'#/calendario', label:'Calendario', icon:'📅'},
+  {hash:'#/documentos', label:'Documentos', icon:'📎'},
+  {hash:'#/reportes', label:'Reportes', icon:'📈'},
+  {hash:'#/ajustes', label:'Ajustes', icon:'⚙️'},
+];
+function renderNav(){
+  const cur = location.hash || '#/dashboard';
+  const curBase = '#/' + cur.slice(2).split('/')[0];
+  $('#navLinks').innerHTML = NAV.map(n=>`
+    <a href="${n.hash}" class="sidebar-link flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-slate-700 ${curBase===n.hash?'active':''}">
+      <span>${n.icon}</span><span>${n.label}</span>
+    </a>`).join('');
+}
+
+function route(){
+  renderNav();
+  $('#sidebar').classList.add('-translate-x-full');
+  render();
+}
+function render(){
+  const hash = (location.hash || '#/dashboard').slice(2);
+  const [mod, id, sub] = hash.split('/');
+  const app = $('#app');
+  try{
+    switch(mod){
+      case '': case 'dashboard': app.innerHTML = viewDashboard(); break;
+      case 'clientes': app.innerHTML = id ? viewClientDetail(id) : viewClientsList(); break;
+      case 'expedientes': app.innerHTML = id ? viewCaseDetail(id) : viewCasesList(); break;
+      case 'inmuebles': app.innerHTML = id ? viewPropertyDetail(id) : viewPropertiesList(); break;
+      case 'contratos': app.innerHTML = viewContractDetail(id); break;
+      case 'calendario': app.innerHTML = viewCalendar(); break;
+      case 'documentos': app.innerHTML = viewDocuments(); break;
+      case 'reportes': app.innerHTML = viewReports(); break;
+      case 'ajustes': app.innerHTML = viewSettings(); break;
+      default: app.innerHTML = viewDashboard();
+    }
+  }catch(e){
+    console.error(e);
+    app.innerHTML = `<div class="card p-6 text-red-600">Error al mostrar esta vista: ${esc(e.message)}</div>`;
+  }
+  afterRenderHooks();
+}
+let _afterRender = null;
+function afterRenderHooks(){ if(_afterRender){ const f=_afterRender; _afterRender=null; f(); } }
+
+/* =========================================================
+   VISTA: DASHBOARD
+========================================================= */
+function viewDashboard(){
+  const statusCounts = {};
+  state.pipelineStages.forEach(s=>statusCounts[s]=0);
+  state.cases.forEach(c=>{ statusCounts[c.status] = (statusCounts[c.status]||0)+1; });
+
+  const deadlines = allUpcomingDeadlines(30).slice(0,12);
+
+  const activeContracts = state.contracts.filter(c=>c.status==='Activo');
+  const totalMonthlyRent = activeContracts.reduce((s,c)=>s+Number(c.rentAmount||0),0);
+  const curMonth = todayISO().slice(0,7);
+  const paysThisMonth = state.payments.filter(p=>p.period===curMonth);
+  const cobradoMes = paysThisMonth.reduce((s,p)=>s+ (p.status==='Cobrado'? Number(p.paidAmount||0):0), 0);
+  const impagosCount = state.payments.filter(p=>p.status==='Impago').length;
+
+  return `
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+    <h1 class="text-xl font-bold text-slate-800">Dashboard</h1>
+    <div class="flex gap-2">
+      <button data-action="client-new" class="btn btn-primary">+ Cliente</button>
+      <button data-action="case-new" class="btn btn-primary">+ Expediente</button>
+      <button data-action="property-new" class="btn btn-primary">+ Inmueble</button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+    ${state.pipelineStages.map(s=>`
+      <div class="stat-tile">
+        <div class="text-2xl font-bold text-slate-800">${statusCounts[s]||0}</div>
+        <div class="text-xs text-slate-500 mt-1">${esc(s)}</div>
+      </div>`).join('')}
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+    <div class="stat-tile"><div class="text-xs text-slate-500 mb-1">Renta mensual activa</div><div class="text-2xl font-bold text-slate-800">${fmtMoney(totalMonthlyRent)}</div><div class="text-xs text-slate-400 mt-1">${activeContracts.length} contratos activos</div></div>
+    <div class="stat-tile"><div class="text-xs text-slate-500 mb-1">Cobrado este mes</div><div class="text-2xl font-bold text-green-700">${fmtMoney(cobradoMes)}</div><div class="text-xs text-slate-400 mt-1">de ${fmtMoney(activeContracts.reduce((s,c)=>s+Number(c.rentAmount||0),0))} previsto</div></div>
+    <div class="stat-tile"><div class="text-xs text-slate-500 mb-1">Impagos históricos</div><div class="text-2xl font-bold text-red-600">${impagosCount}</div><div class="text-xs text-slate-400 mt-1">pagos marcados como impago</div></div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="card p-4">
+      <h2 class="font-bold text-sm text-slate-700 mb-3">Próximos vencimientos (30 días)</h2>
+      ${deadlines.length===0 ? '<p class="text-sm text-slate-400">Sin vencimientos próximos.</p>' : `
+      <div class="space-y-2">
+        ${deadlines.map(d=>{
+          const u = urgency(d.date,false);
+          return `<a href="${d.link}" class="flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-slate-50 border border-slate-100">
+            <div class="min-w-0">
+              <div class="text-sm font-medium text-slate-800 truncate">${esc(d.title)}</div>
+              <div class="text-xs text-slate-500 truncate"><span class="badge ${d.kindColor==='badge-gold'?'badge-yellow':'badge-blue'}">${d.kind}</span> ${esc(d.refLabel)} · ${esc(d.entityName)}</div>
+            </div>
+            ${badge(u)}
+          </a>`;
+        }).join('')}
+      </div>`}
+    </div>
+
+    <div class="card p-4">
+      <h2 class="font-bold text-sm text-slate-700 mb-3">Últimos expedientes</h2>
+      <div class="space-y-2">
+        ${state.cases.slice().sort((a,b)=> b.openDate.localeCompare(a.openDate)).slice(0,6).map(c=>`
+          <a href="#/expedientes/${c.id}" class="flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-slate-50 border border-slate-100">
+            <div class="min-w-0">
+              <div class="text-sm font-medium text-slate-800 truncate">${esc(c.ref)} — ${esc(c.matterType)}</div>
+              <div class="text-xs text-slate-500 truncate">${esc(clientName(c.clientId))}</div>
+            </div>
+            <span class="badge badge-gray">${esc(c.status)}</span>
+          </a>`).join('')}
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+/* =========================================================
+   VISTA: CLIENTES
+========================================================= */
+let clientFilter = {q:''};
+function viewClientsList(){
+  const q = clientFilter.q.toLowerCase();
+  const rows = state.clients.filter(c=>{
+    if(!q) return true;
+    return (c.name+c.taxId+c.email).toLowerCase().includes(q);
+  });
+  return `
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+    <h1 class="text-xl font-bold text-slate-800">Clientes</h1>
+    <button data-action="client-new" class="btn btn-primary">+ Nuevo cliente</button>
+  </div>
+  <div class="card p-3 mb-4">
+    <input type="text" id="clientSearch" placeholder="Buscar por nombre, NIF/CIF o email..." value="${esc(clientFilter.q)}" class="max-w-sm">
+  </div>
+  <div class="card overflow-x-auto">
+    <table class="tbl">
+      <thead><tr><th>Nombre</th><th>NIF/CIF</th><th>Tipo</th><th>Contacto</th><th>Expedientes</th><th>Inmuebles</th><th></th></tr></thead>
+      <tbody>
+        ${rows.length===0? `<tr><td colspan="7" class="text-center text-slate-400 py-6">Sin resultados</td></tr>` : rows.map(c=>`
+        <tr>
+          <td><a href="#/clientes/${c.id}" class="font-semibold text-slate-800 hover:text-[#b8860b]">${esc(c.name)}</a></td>
+          <td>${esc(c.taxId)}</td>
+          <td><span class="badge ${c.type==='empresa'?'badge-blue':'badge-gray'}">${c.type==='empresa'?'Empresa':'Particular'}</span></td>
+          <td class="text-slate-500">${esc(c.email)}<br><span class="text-xs">${esc(c.phone)}</span></td>
+          <td>${casesOfClient(c.id).length}</td>
+          <td>${propertiesOfClient(c.id).length}</td>
+          <td class="text-right"><button data-action="client-edit" data-id="${c.id}" class="btn btn-outline btn-sm">Editar</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+function clientForm(client){
+  const c = client || {name:'',taxId:'',type:'particular',email:'',phone:'',address:'',notes:''};
+  return `
+  <form data-form="client" data-id="${c.id||''}" class="space-y-3">
+    <div class="grid grid-cols-2 gap-3">
+      <div class="col-span-2"><label class="field-label">Nombre / Razón social *</label><input type="text" name="name" required value="${esc(c.name)}"></div>
+      <div><label class="field-label">NIF / CIF</label><input type="text" name="taxId" value="${esc(c.taxId)}"></div>
+      <div><label class="field-label">Tipo</label>
+        <select name="type"><option value="particular" ${c.type==='particular'?'selected':''}>Particular</option><option value="empresa" ${c.type==='empresa'?'selected':''}>Empresa</option></select>
+      </div>
+      <div><label class="field-label">Email</label><input type="email" name="email" value="${esc(c.email)}"></div>
+      <div><label class="field-label">Teléfono</label><input type="tel" name="phone" value="${esc(c.phone)}"></div>
+      <div class="col-span-2"><label class="field-label">Dirección</label><input type="text" name="address" value="${esc(c.address)}"></div>
+      <div class="col-span-2"><label class="field-label">Notas</label><textarea name="notes" rows="3">${esc(c.notes)}</textarea></div>
+    </div>
+    <div class="flex justify-between pt-2">
+      ${c.id? `<button type="button" data-action="client-delete" data-id="${c.id}" class="btn btn-danger">Eliminar</button>`:'<span></span>'}
+      <div class="flex gap-2"><button type="button" data-action="modal-close" class="btn btn-outline">Cancelar</button><button type="submit" class="btn btn-primary">Guardar</button></div>
+    </div>
+  </form>`;
+}
+function viewClientDetail(id){
+  const c = clientById(id);
+  if(!c) return `<p>Cliente no encontrado. <a href="#/clientes" class="text-[#b8860b]">Volver</a></p>`;
+  const cases = casesOfClient(id);
+  const props = propertiesOfClient(id);
+  const docs = state.documents.filter(d=>d.relatedType==='client' && d.relatedId===id);
+  return `
+  <a href="#/clientes" class="text-sm text-slate-500 hover:text-slate-800">&larr; Clientes</a>
+  <div class="flex flex-wrap items-center justify-between gap-3 my-3">
+    <div>
+      <h1 class="text-xl font-bold text-slate-800">${esc(c.name)} <span class="badge ${c.type==='empresa'?'badge-blue':'badge-gray'} align-middle">${c.type==='empresa'?'Empresa':'Particular'}</span></h1>
+      <div class="text-sm text-slate-500 mt-1">NIF/CIF: ${esc(c.taxId)||'—'} · ${esc(c.email)||'—'} · ${esc(c.phone)||'—'}</div>
+    </div>
+    <button data-action="client-edit" data-id="${c.id}" class="btn btn-outline">Editar ficha</button>
+  </div>
+  <div class="card p-4 mb-4"><div class="text-xs text-slate-500 mb-1">Dirección</div><div class="text-sm mb-2">${esc(c.address)||'—'}</div><div class="text-xs text-slate-500 mb-1">Notas</div><div class="text-sm whitespace-pre-line">${esc(c.notes)||'—'}</div></div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="card p-4">
+      <div class="flex items-center justify-between mb-2"><h2 class="font-bold text-sm">Expedientes (${cases.length})</h2><button data-action="case-new" data-client="${c.id}" class="btn btn-sm btn-outline">+ Nuevo</button></div>
+      ${cases.length===0?'<p class="text-sm text-slate-400">Sin expedientes.</p>':`<div class="space-y-2">${cases.map(x=>`
+        <a href="#/expedientes/${x.id}" class="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 border border-slate-100">
+          <span class="text-sm font-medium">${esc(x.ref)} · ${esc(x.matterType)}</span><span class="badge badge-gray">${esc(x.status)}</span>
+        </a>`).join('')}</div>`}
+    </div>
+    <div class="card p-4">
+      <div class="flex items-center justify-between mb-2"><h2 class="font-bold text-sm">Inmuebles (${props.length})</h2><button data-action="property-new" data-client="${c.id}" class="btn btn-sm btn-outline">+ Nuevo</button></div>
+      ${props.length===0?'<p class="text-sm text-slate-400">Sin inmuebles.</p>':`<div class="space-y-2">${props.map(p=>`
+        <a href="#/inmuebles/${p.id}" class="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 border border-slate-100">
+          <span class="text-sm font-medium">${esc(p.address)}</span><span class="text-xs text-slate-400">${esc(p.type)}</span>
+        </a>`).join('')}</div>`}
+    </div>
+  </div>
+  <div class="card p-4 mt-4">
+    <h2 class="font-bold text-sm mb-2">Documentos (${docs.length})</h2>
+    ${docs.length===0?'<p class="text-sm text-slate-400">Sin documentos.</p>':`<ul class="text-sm space-y-1">${docs.map(d=>`<li><a href="${esc(d.url)}" target="_blank" class="text-[#b8860b] hover:underline">${esc(d.name)}</a></li>`).join('')}</ul>`}
+  </div>
+  `;
+}
+
+/* =========================================================
+   VISTA: EXPEDIENTES
+========================================================= */
+let caseViewMode = 'kanban';
+let caseFilter = {q:'', client:'', status:'', lawyer:'', matter:''};
+function caseMatchesFilter(c){
+  if(caseFilter.client && c.clientId!==caseFilter.client) return false;
+  if(caseFilter.status && c.status!==caseFilter.status) return false;
+  if(caseFilter.lawyer && c.lawyer!==caseFilter.lawyer) return false;
+  if(caseFilter.matter && c.matterType!==caseFilter.matter) return false;
+  if(caseFilter.q){
+    const q = caseFilter.q.toLowerCase();
+    if(!(c.ref+clientName(c.clientId)+c.description).toLowerCase().includes(q)) return false;
+  }
+  return true;
+}
+function caseFiltersBar(){
+  return `
+  <div class="card p-3 mb-4 flex flex-wrap gap-2 items-end">
+    <div class="flex-1 min-w-[160px]"><label class="field-label">Buscar</label><input type="text" id="caseSearch" value="${esc(caseFilter.q)}" placeholder="Ref., cliente, descripción..."></div>
+    <div class="min-w-[150px]"><label class="field-label">Cliente</label><select id="caseFClient"><option value="">Todos</option>${state.clients.map(c=>`<option value="${c.id}" ${caseFilter.client===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>
+    <div class="min-w-[140px]"><label class="field-label">Estado</label><select id="caseFStatus"><option value="">Todos</option>${state.pipelineStages.map(s=>`<option ${caseFilter.status===s?'selected':''}>${esc(s)}</option>`).join('')}</select></div>
+    <div class="min-w-[140px]"><label class="field-label">Abogado</label><select id="caseFLawyer"><option value="">Todos</option>${state.lawyers.map(l=>`<option ${caseFilter.lawyer===l?'selected':''}>${esc(l)}</option>`).join('')}</select></div>
+    <div class="min-w-[140px]"><label class="field-label">Tipo</label><select id="caseFMatter"><option value="">Todos</option>${state.matterTypes.map(m=>`<option ${caseFilter.matter===m?'selected':''}>${esc(m)}</option>`).join('')}</select></div>
+    <button data-action="case-filter-clear" class="btn btn-outline btn-sm">Limpiar</button>
+  </div>`;
+}
+function viewCasesList(){
+  const rows = state.cases.filter(caseMatchesFilter);
+  return `
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+    <h1 class="text-xl font-bold text-slate-800">Expedientes</h1>
+    <div class="flex gap-2">
+      <div class="flex rounded-lg overflow-hidden border border-slate-300">
+        <button data-action="case-view-kanban" class="btn btn-sm ${caseViewMode==='kanban'?'btn-primary':'btn-outline !border-0'}">Kanban</button>
+        <button data-action="case-view-list" class="btn btn-sm ${caseViewMode==='list'?'btn-primary':'btn-outline !border-0'}">Listado</button>
+      </div>
+      <button data-action="case-new" class="btn btn-primary">+ Nuevo expediente</button>
+    </div>
+  </div>
+  ${caseFiltersBar()}
+  ${caseViewMode==='kanban' ? renderKanban(rows) : renderCaseTable(rows)}
+  `;
+}
+function renderKanban(rows){
+  return `<div class="flex gap-3 overflow-x-auto pb-2">
+    ${state.pipelineStages.map(stage=>{
+      const items = rows.filter(c=>c.status===stage);
+      return `
+      <div class="kanban-col" data-status="${esc(stage)}">
+        <div class="px-3 py-2 font-bold text-xs text-slate-600 flex items-center justify-between">${esc(stage)} <span class="badge badge-gray">${items.length}</span></div>
+        <div class="flex-1 overflow-y-auto px-2 pb-2 kanban-dropzone" data-status="${esc(stage)}">
+          ${items.map(c=>{
+            const nextMilestone = (c.milestones||[]).filter(m=>!m.done).sort((a,b)=>a.dueDate.localeCompare(b.dueDate))[0];
+            return `
+            <div class="kanban-card" draggable="true" data-caseid="${c.id}">
+              <a href="#/expedientes/${c.id}" class="block">
+                <div class="text-sm font-semibold text-slate-800">${esc(c.ref)}</div>
+                <div class="text-xs text-slate-500 mb-1">${esc(clientName(c.clientId))}</div>
+                <div class="text-xs text-slate-400">${esc(c.matterType)} · ${esc(c.lawyer)}</div>
+              </a>
+              ${nextMilestone? `<div class="mt-2">${badge(urgency(nextMilestone.dueDate,false))}</div>`:''}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+function renderCaseTable(rows){
+  return `<div class="card overflow-x-auto">
+    <table class="tbl">
+      <thead><tr><th>Referencia</th><th>Cliente</th><th>Tipo</th><th>Abogado</th><th>Apertura</th><th>Estado</th><th>Próximo hito</th><th></th></tr></thead>
+      <tbody>
+        ${rows.length===0?`<tr><td colspan="8" class="text-center text-slate-400 py-6">Sin resultados</td></tr>`: rows.map(c=>{
+          const nextMilestone = (c.milestones||[]).filter(m=>!m.done).sort((a,b)=>a.dueDate.localeCompare(b.dueDate))[0];
+          return `<tr>
+            <td><a href="#/expedientes/${c.id}" class="font-semibold text-slate-800 hover:text-[#b8860b]">${esc(c.ref)}</a></td>
+            <td>${esc(clientName(c.clientId))}</td>
+            <td>${esc(c.matterType)}</td>
+            <td>${esc(c.lawyer)}</td>
+            <td>${fmtDate(c.openDate)}</td>
+            <td><span class="badge badge-gray">${esc(c.status)}</span></td>
+            <td>${nextMilestone? badge(urgency(nextMilestone.dueDate,false)) : '<span class="text-slate-300">—</span>'}</td>
+            <td class="text-right"><button data-action="case-edit" data-id="${c.id}" class="btn btn-outline btn-sm">Editar</button></td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+function caseForm(cs, presetClient){
+  const c = cs || {ref:`EXP-${new Date().getFullYear()}-${String(state.cases.length+1).padStart(3,'0')}`, clientId:presetClient||'', matterType:state.matterTypes[0], lawyer:state.lawyers[0], openDate:todayISO(), description:'', fees:0, status:state.pipelineStages[0]};
+  return `
+  <form data-form="case" data-id="${c.id||''}" class="space-y-3">
+    <div class="grid grid-cols-2 gap-3">
+      <div><label class="field-label">Referencia *</label><input type="text" name="ref" required value="${esc(c.ref)}"></div>
+      <div><label class="field-label">Cliente *</label><select name="clientId" required><option value="">Seleccionar...</option>${state.clients.map(cl=>`<option value="${cl.id}" ${c.clientId===cl.id?'selected':''}>${esc(cl.name)}</option>`).join('')}</select></div>
+      <div><label class="field-label">Tipo de asunto</label><select name="matterType">${state.matterTypes.map(m=>`<option ${c.matterType===m?'selected':''}>${esc(m)}</option>`).join('')}</select></div>
+      <div><label class="field-label">Abogado responsable</label><select name="lawyer">${state.lawyers.map(l=>`<option ${c.lawyer===l?'selected':''}>${esc(l)}</option>`).join('')}</select></div>
+      <div><label class="field-label">Fecha de apertura</label><input type="date" name="openDate" value="${esc(c.openDate)}"></div>
+      <div><label class="field-label">Estado</label><select name="status">${state.pipelineStages.map(s=>`<option ${c.status===s?'selected':''}>${esc(s)}</option>`).join('')}</select></div>
+      <div><label class="field-label">Honorarios (€)</label><input type="number" step="0.01" name="fees" value="${c.fees||0}"></div>
+      <div class="col-span-2"><label class="field-label">Descripción</label><textarea name="description" rows="3">${esc(c.description)}</textarea></div>
+    </div>
+    <div class="flex justify-between pt-2">
+      ${c.id? `<button type="button" data-action="case-delete" data-id="${c.id}" class="btn btn-danger">Eliminar</button>`:'<span></span>'}
+      <div class="flex gap-2"><button type="button" data-action="modal-close" class="btn btn-outline">Cancelar</button><button type="submit" class="btn btn-primary">Guardar</button></div>
+    </div>
+  </form>`;
+}
+function viewCaseDetail(id){
+  const c = caseById(id);
+  if(!c) return `<p>Expediente no encontrado. <a href="#/expedientes" class="text-[#b8860b]">Volver</a></p>`;
+  const docs = state.documents.filter(d=>d.relatedType==='case' && d.relatedId===id);
+  const milestones = (c.milestones||[]).slice().sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
+  const log = (c.log||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+  return `
+  <a href="#/expedientes" class="text-sm text-slate-500 hover:text-slate-800">&larr; Expedientes</a>
+  <div class="flex flex-wrap items-center justify-between gap-3 my-3">
+    <div>
+      <h1 class="text-xl font-bold text-slate-800">${esc(c.ref)} <span class="badge badge-gray align-middle">${esc(c.status)}</span></h1>
+      <div class="text-sm text-slate-500 mt-1"><a href="#/clientes/${c.clientId}" class="hover:text-[#b8860b]">${esc(clientName(c.clientId))}</a> · ${esc(c.matterType)} · ${esc(c.lawyer)} · Abierto ${fmtDate(c.openDate)}</div>
+    </div>
+    <button data-action="case-edit" data-id="${c.id}" class="btn btn-outline">Editar ficha</button>
+  </div>
+  <div class="card p-4 mb-4"><div class="text-xs text-slate-500 mb-1">Descripción</div><div class="text-sm whitespace-pre-line mb-2">${esc(c.description)||'—'}</div><div class="text-xs text-slate-500">Honorarios: <span class="font-semibold text-slate-700">${fmtMoney(c.fees)}</span></div></div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="card p-4">
+      <div class="flex items-center justify-between mb-2"><h2 class="font-bold text-sm">Hitos y plazos</h2><button data-action="milestone-new" data-case="${c.id}" class="btn btn-sm btn-outline">+ Añadir</button></div>
+      ${milestones.length===0?'<p class="text-sm text-slate-400">Sin hitos.</p>':`<div class="space-y-2">${milestones.map(m=>`
+        <div class="flex items-center justify-between p-2 rounded-lg border border-slate-100">
+          <div class="flex items-center gap-2 min-w-0">
+            <input type="checkbox" data-action="milestone-toggle" data-case="${c.id}" data-id="${m.id}" ${m.done?'checked':''}>
+            <span class="text-sm truncate ${m.done?'line-through text-slate-400':''}">${esc(m.title)}</span>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            ${badge(urgency(m.dueDate, m.done))}
+            <button data-action="milestone-delete" data-case="${c.id}" data-id="${m.id}" class="text-slate-300 hover:text-red-500 text-lg leading-none">&times;</button>
+          </div>
+        </div>`).join('')}</div>`}
+    </div>
+    <div class="card p-4">
+      <div class="flex items-center justify-between mb-2"><h2 class="font-bold text-sm">Bitácora de actuaciones</h2><button data-action="log-new" data-case="${c.id}" class="btn btn-sm btn-outline">+ Añadir</button></div>
+      ${log.length===0?'<p class="text-sm text-slate-400">Sin actuaciones registradas.</p>':`<div class="space-y-2 max-h-80 overflow-y-auto">${log.map(l=>`
+        <div class="p-2 rounded-lg border border-slate-100">
+          <div class="flex items-center justify-between"><span class="text-xs font-semibold text-slate-500">${fmtDate(l.date)}</span><button data-action="log-delete" data-case="${c.id}" data-id="${l.id}" class="text-slate-300 hover:text-red-500 text-lg leading-none">&times;</button></div>
+          <div class="text-sm text-slate-700 mt-1 whitespace-pre-line">${esc(l.text)}</div>
+        </div>`).join('')}</div>`}
+    </div>
+  </div>
+
+  <div class="card p-4 mt-4">
+    <div class="flex items-center justify-between mb-2"><h2 class="font-bold text-sm">Documentos (${docs.length})</h2><button data-action="document-new" data-type="case" data-related="${c.id}" class="btn btn-sm btn-outline">+ Añadir</button></div>
+    ${docs.length===0?'<p class="text-sm text-slate-400">Sin documentos.</p>':`<ul class="text-sm space-y-1">${docs.map(d=>`<li class="flex items-center justify-between"><a href="${esc(d.url)}" target="_blank" class="text-[#b8860b] hover:underline">${esc(d.name)}</a><button data-action="document-delete" data-id="${d.id}" class="text-slate-300 hover:text-red-500 text-lg leading-none">&times;</button></li>`).join('')}</ul>`}
+  </div>
+  `;
+}
+
+/* =========================================================
+   VISTA: INMUEBLES Y ALQUILERES
+========================================================= */
+let propertyFilter = {q:'', client:''};
+let propertyViewMode = 'list';
+let financeFilter = {client:'', property:'', status:'', period:''};
+function viewPropertiesList(){
+  return `
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+    <h1 class="text-xl font-bold text-slate-800">Inmuebles y Alquileres</h1>
+    <div class="flex gap-2">
+      <div class="flex rounded-lg overflow-hidden border border-slate-300">
+        <button data-action="property-view-list" class="btn btn-sm ${propertyViewMode==='list'?'btn-primary':'btn-outline !border-0'}">Inmuebles</button>
+        <button data-action="property-view-finance" class="btn btn-sm ${propertyViewMode==='finance'?'btn-primary':'btn-outline !border-0'}">Control financiero</button>
+      </div>
+      <button data-action="property-new" class="btn btn-primary">+ Nuevo inmueble</button>
+    </div>
+  </div>
+  ${propertyViewMode==='list' ? renderPropertiesGrid() : renderFinanceControl()}
+  `;
+}
+function renderPropertiesGrid(){
+  const q = propertyFilter.q.toLowerCase();
+  const rows = state.properties.filter(p=>{
+    if(propertyFilter.client && p.clientId!==propertyFilter.client) return false;
+    if(q && !(p.address+clientName(p.clientId)+p.type).toLowerCase().includes(q)) return false;
+    return true;
+  });
+  return `
+  <div class="card p-3 mb-4 flex flex-wrap gap-2 items-end">
+    <div class="flex-1 min-w-[160px]"><label class="field-label">Buscar</label><input type="text" id="propertySearch" value="${esc(propertyFilter.q)}" placeholder="Buscar por dirección, propietario o tipo..."></div>
+    <div class="min-w-[180px]"><label class="field-label">Cliente propietario</label><select id="propertyFClient"><option value="">Todos</option>${state.clients.map(c=>`<option value="${c.id}" ${propertyFilter.client===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>
+    <button data-action="property-filter-clear" class="btn btn-outline btn-sm">Limpiar</button>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+    ${rows.length===0?'<p class="text-slate-400 col-span-full text-center py-6">Sin resultados</p>':rows.map(p=>{
+      const ct = activeContractOf(p.id);
+      const u = ct ? urgency(ct.renewalDate||ct.endDate,false) : null;
+      return `
+      <a href="#/inmuebles/${p.id}" class="card p-4 hover:shadow-md transition block">
+        <div class="flex items-start justify-between gap-2">
+          <div class="font-semibold text-slate-800">${esc(p.address)}</div>
+          ${u?badge(u):'<span class="badge badge-gray">Sin contrato</span>'}
+        </div>
+        <div class="text-xs text-slate-500 mt-1">${esc(p.type)} · ${p.area?p.area+' m²':''}</div>
+        <div class="text-xs text-slate-500">Propietario: ${esc(clientName(p.clientId))}</div>
+        ${ct?`<div class="text-sm mt-2 text-slate-700">Arrendatario: <span class="font-medium">${esc(ct.tenant)}</span> · ${fmtMoney(ct.rentAmount)}/mes</div>`:''}
+      </a>`;
+    }).join('')}
+  </div>`;
+}
+function renderFinanceControl(){
+  const rows = state.payments.map(p=>{
+    const ct = contractById(p.contractId);
+    const prop = ct ? propertyById(ct.propertyId) : null;
+    return {...p, ct, prop, clientId: prop? prop.clientId: null};
+  }).filter(r=>r.ct && r.prop);
+
+  const filtered = rows.filter(r=>{
+    if(financeFilter.client && r.clientId!==financeFilter.client) return false;
+    if(financeFilter.property && r.prop.id!==financeFilter.property) return false;
+    if(financeFilter.status && r.status!==financeFilter.status) return false;
+    if(financeFilter.period && r.period!==financeFilter.period) return false;
+    return true;
+  }).sort((a,b)=> b.period.localeCompare(a.period));
+
+  const previsto = filtered.reduce((s,r)=>s+Number(r.expectedAmount||0),0);
+  const cobrado = filtered.reduce((s,r)=> s+(r.status==='Cobrado'?Number(r.paidAmount||0):0),0);
+  const impagado = filtered.reduce((s,r)=> s+(r.status==='Impago'?Number(r.expectedAmount||0):0),0);
+
+  const periods = Array.from(new Set(rows.map(r=>r.period))).sort();
+  const last6 = periods.slice(-6);
+  const chartData = last6.map(period=>({label:period.slice(5), value: rows.filter(r=>r.period===period && r.status==='Cobrado').reduce((s,r)=>s+Number(r.paidAmount||0),0)}));
+
+  return `
+  <div class="card p-3 mb-4 flex flex-wrap gap-2 items-end">
+    <div class="min-w-[160px]"><label class="field-label">Cliente</label><select id="finFClient"><option value="">Todos</option>${state.clients.map(c=>`<option value="${c.id}" ${financeFilter.client===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>
+    <div class="min-w-[180px]"><label class="field-label">Inmueble</label><select id="finFProperty"><option value="">Todos</option>${state.properties.map(p=>`<option value="${p.id}" ${financeFilter.property===p.id?'selected':''}>${esc(p.address)}</option>`).join('')}</select></div>
+    <div class="min-w-[140px]"><label class="field-label">Estado de pago</label><select id="finFStatus"><option value="">Todos</option>${['Pendiente','Cobrado','Impago'].map(s=>`<option ${financeFilter.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+    <div class="min-w-[140px]"><label class="field-label">Periodo</label><select id="finFPeriod"><option value="">Todos</option>${periods.slice().reverse().map(p=>`<option ${financeFilter.period===p?'selected':''}>${p}</option>`).join('')}</select></div>
+    <button data-action="finance-filter-clear" class="btn btn-outline btn-sm">Limpiar</button>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+    <div class="stat-tile"><div class="text-xs text-slate-500">Previsto</div><div class="text-lg font-bold">${fmtMoney(previsto)}</div></div>
+    <div class="stat-tile"><div class="text-xs text-slate-500">Cobrado</div><div class="text-lg font-bold text-green-700">${fmtMoney(cobrado)}</div></div>
+    <div class="stat-tile"><div class="text-xs text-slate-500">Impagado</div><div class="text-lg font-bold text-red-600">${fmtMoney(impagado)}</div></div>
+  </div>
+
+  <div class="card p-4 mb-4">
+    <h2 class="font-bold text-sm mb-2">Ingresos cobrados por mes (todos los inmuebles)</h2>
+    ${chartData.length===0?'<p class="text-sm text-slate-400">Sin histórico.</p>':svgBarChart(chartData)}
+  </div>
+
+  <div class="card overflow-x-auto">
+    <table class="tbl">
+      <thead><tr><th>Periodo</th><th>Inmueble</th><th>Cliente</th><th>Arrendatario</th><th>Previsto</th><th>Cobrado</th><th>Estado</th><th></th></tr></thead>
+      <tbody>
+        ${filtered.length===0?`<tr><td colspan="8" class="text-center text-slate-400 py-6">Sin resultados</td></tr>`:filtered.map(r=>`
+        <tr>
+          <td class="font-medium">${esc(r.period)}</td>
+          <td><a href="#/inmuebles/${r.prop.id}" class="text-[#b8860b] hover:underline">${esc(r.prop.address)}</a></td>
+          <td>${esc(clientName(r.clientId))}</td>
+          <td>${esc(r.ct.tenant)}</td>
+          <td>${fmtMoney(r.expectedAmount)}</td>
+          <td>${r.status==='Cobrado'?fmtMoney(r.paidAmount):'—'}</td>
+          <td><span class="badge ${r.status==='Cobrado'?'badge-green':r.status==='Impago'?'badge-red':'badge-yellow'}">${esc(r.status)}</span></td>
+          <td class="text-right"><a href="#/contratos/${r.ct.id}" class="btn btn-outline btn-sm">Ver contrato</a></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+function propertyForm(p, presetClient){
+  const x = p || {clientId:presetClient||'', address:'', cadastralRef:'', type:'Vivienda', area:'', notes:''};
+  return `
+  <form data-form="property" data-id="${x.id||''}" class="space-y-3">
+    <div class="grid grid-cols-2 gap-3">
+      <div class="col-span-2"><label class="field-label">Dirección *</label><input type="text" name="address" required value="${esc(x.address)}"></div>
+      <div><label class="field-label">Cliente propietario *</label><select name="clientId" required><option value="">Seleccionar...</option>${state.clients.map(c=>`<option value="${c.id}" ${x.clientId===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>
+      <div><label class="field-label">Tipo</label><select name="type">${['Vivienda','Local comercial','Nave industrial','Oficina','Garaje','Otro'].map(t=>`<option ${x.type===t?'selected':''}>${t}</option>`).join('')}</select></div>
+      <div><label class="field-label">Referencia catastral</label><input type="text" name="cadastralRef" value="${esc(x.cadastralRef)}"></div>
+      <div><label class="field-label">Superficie (m²)</label><input type="number" name="area" value="${esc(x.area)}"></div>
+      <div class="col-span-2"><label class="field-label">Notas</label><textarea name="notes" rows="3">${esc(x.notes)}</textarea></div>
+    </div>
+    <div class="flex justify-between pt-2">
+      ${x.id? `<button type="button" data-action="property-delete" data-id="${x.id}" class="btn btn-danger">Eliminar</button>`:'<span></span>'}
+      <div class="flex gap-2"><button type="button" data-action="modal-close" class="btn btn-outline">Cancelar</button><button type="submit" class="btn btn-primary">Guardar</button></div>
+    </div>
+  </form>`;
+}
+function contractForm(ct, presetProperty){
+  const x = ct || {propertyId:presetProperty||'', tenant:'', startDate:todayISO(), endDate:'', renewalDate:'', rentAmount:0, deposit:0, expenses:'', ipcNotes:'', notes:'', status:'Activo'};
+  return `
+  <form data-form="contract" data-id="${x.id||''}" class="space-y-3">
+    <div class="grid grid-cols-2 gap-3">
+      <div class="col-span-2"><label class="field-label">Inmueble *</label><select name="propertyId" required>${state.properties.map(p=>`<option value="${p.id}" ${x.propertyId===p.id?'selected':''}>${esc(p.address)}</option>`).join('')}</select></div>
+      <div class="col-span-2"><label class="field-label">Arrendatario (empresa/persona) *</label><input type="text" name="tenant" required value="${esc(x.tenant)}"></div>
+      <div><label class="field-label">Fecha inicio</label><input type="date" name="startDate" value="${esc(x.startDate)}"></div>
+      <div><label class="field-label">Fecha vencimiento</label><input type="date" name="endDate" value="${esc(x.endDate)}"></div>
+      <div><label class="field-label">Fecha renovación</label><input type="date" name="renewalDate" value="${esc(x.renewalDate)}"></div>
+      <div><label class="field-label">Estado</label><select name="status">${['Activo','Finalizado'].map(s=>`<option ${x.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      <div><label class="field-label">Renta mensual (€)</label><input type="number" step="0.01" name="rentAmount" value="${x.rentAmount||0}"></div>
+      <div><label class="field-label">Fianza (€)</label><input type="number" step="0.01" name="deposit" value="${x.deposit||0}"></div>
+      <div class="col-span-2"><label class="field-label">Gastos (quién los asume)</label><input type="text" name="expenses" value="${esc(x.expenses)}"></div>
+      <div class="col-span-2"><label class="field-label">Actualización de renta (IPC)</label><input type="text" name="ipcNotes" value="${esc(x.ipcNotes)}"></div>
+      <div class="col-span-2"><label class="field-label">Notas / documentos</label><textarea name="notes" rows="2">${esc(x.notes)}</textarea></div>
+    </div>
+    <div class="flex justify-between pt-2">
+      ${x.id? `<button type="button" data-action="contract-delete" data-id="${x.id}" class="btn btn-danger">Eliminar</button>`:'<span></span>'}
+      <div class="flex gap-2"><button type="button" data-action="modal-close" class="btn btn-outline">Cancelar</button><button type="submit" class="btn btn-primary">Guardar</button></div>
+    </div>
+  </form>`;
+}
+function viewPropertyDetail(id){
+  const p = propertyById(id);
+  if(!p) return `<p>Inmueble no encontrado. <a href="#/inmuebles" class="text-[#b8860b]">Volver</a></p>`;
+  const contracts = contractsOfProperty(id);
+  const docs = state.documents.filter(d=>d.relatedType==='property' && d.relatedId===id);
+  return `
+  <a href="#/inmuebles" class="text-sm text-slate-500 hover:text-slate-800">&larr; Inmuebles</a>
+  <div class="flex flex-wrap items-center justify-between gap-3 my-3">
+    <div>
+      <h1 class="text-xl font-bold text-slate-800">${esc(p.address)}</h1>
+      <div class="text-sm text-slate-500 mt-1">${esc(p.type)} ${p.area?'· '+p.area+' m²':''} · Propietario: <a href="#/clientes/${p.clientId}" class="hover:text-[#b8860b]">${esc(clientName(p.clientId))}</a></div>
+    </div>
+    <button data-action="property-edit" data-id="${p.id}" class="btn btn-outline">Editar ficha</button>
+  </div>
+  <div class="card p-4 mb-4">
+    <div class="text-xs text-slate-500 mb-1">Referencia catastral</div><div class="text-sm mb-2">${esc(p.cadastralRef)||'—'}</div>
+    <div class="text-xs text-slate-500 mb-1">Notas</div><div class="text-sm whitespace-pre-line">${esc(p.notes)||'—'}</div>
+  </div>
+
+  <div class="flex items-center justify-between mb-2">
+    <h2 class="font-bold text-sm">Contratos de arrendamiento</h2>
+    <button data-action="contract-new" data-property="${p.id}" class="btn btn-sm btn-outline">+ Nuevo contrato</button>
+  </div>
+  ${contracts.length===0?'<p class="text-sm text-slate-400 mb-4">Sin contratos.</p>':`
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+    ${contracts.map(ct=>{
+      const u = urgency(ct.renewalDate||ct.endDate,false);
+      return `<a href="#/contratos/${ct.id}" class="card p-4 hover:shadow-md block">
+        <div class="flex items-center justify-between"><span class="font-semibold text-slate-800">${esc(ct.tenant)}</span>${ct.status==='Activo'?badge(u):'<span class="badge badge-gray">Finalizado</span>'}</div>
+        <div class="text-xs text-slate-500 mt-1">${fmtDate(ct.startDate)} → ${fmtDate(ct.endDate)}</div>
+        <div class="text-sm mt-1 text-slate-700">${fmtMoney(ct.rentAmount)}/mes · Fianza ${fmtMoney(ct.deposit)}</div>
+      </a>`;
+    }).join('')}
+  </div>`}
+
+  <div class="card p-4">
+    <div class="flex items-center justify-between mb-2"><h2 class="font-bold text-sm">Documentos (${docs.length})</h2><button data-action="document-new" data-type="property" data-related="${p.id}" class="btn btn-sm btn-outline">+ Añadir</button></div>
+    ${docs.length===0?'<p class="text-sm text-slate-400">Sin documentos.</p>':`<ul class="text-sm space-y-1">${docs.map(d=>`<li class="flex items-center justify-between"><a href="${esc(d.url)}" target="_blank" class="text-[#b8860b] hover:underline">${esc(d.name)}</a><button data-action="document-delete" data-id="${d.id}" class="text-slate-300 hover:text-red-500 text-lg leading-none">&times;</button></li>`).join('')}</ul>`}
+  </div>
+  `;
+}
+
+let paymentFilter = {status:''};
+function computeRentability(contractId){
+  const pays = state.payments.filter(p=>p.contractId===contractId);
+  const previsto = pays.reduce((s,p)=>s+Number(p.expectedAmount||0),0);
+  const cobrado = pays.reduce((s,p)=>s+(p.status==='Cobrado'?Number(p.paidAmount||0):0),0);
+  const impagado = pays.reduce((s,p)=> s + (p.status==='Impago'? Number(p.expectedAmount||0):0), 0);
+  const rate = previsto>0 ? (cobrado/previsto*100) : 0;
+  return {previsto, cobrado, impagado, rate, count: pays.length};
+}
+function paymentForm(pay, contractId){
+  const x = pay || {contractId, period: todayISO().slice(0,7), expectedAmount:0, expectedDate: todayISO(), paidAmount:0, paidDate:'', method:'Transferencia', status:'Pendiente', notes:''};
+  return `
+  <form data-form="payment" data-id="${x.id||''}" data-contract="${contractId}" class="space-y-3">
+    <div class="grid grid-cols-2 gap-3">
+      <div><label class="field-label">Periodo (mes) *</label><input type="month" name="period" required value="${esc(x.period)}"></div>
+      <div><label class="field-label">Estado</label><select name="status">${['Pendiente','Cobrado','Impago'].map(s=>`<option ${x.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      <div><label class="field-label">Importe previsto (€)</label><input type="number" step="0.01" name="expectedAmount" value="${x.expectedAmount||0}"></div>
+      <div><label class="field-label">Fecha prevista</label><input type="date" name="expectedDate" value="${esc(x.expectedDate)}"></div>
+      <div><label class="field-label">Importe cobrado (€)</label><input type="number" step="0.01" name="paidAmount" value="${x.paidAmount||0}"></div>
+      <div><label class="field-label">Fecha real de cobro</label><input type="date" name="paidDate" value="${esc(x.paidDate)}"></div>
+      <div><label class="field-label">Método de pago</label><select name="method">${['Transferencia','Domiciliación','Cheque','Efectivo','Otro'].map(m=>`<option ${x.method===m?'selected':''}>${m}</option>`).join('')}</select></div>
+      <div class="col-span-2"><label class="field-label">Notas</label><textarea name="notes" rows="2">${esc(x.notes)}</textarea></div>
+    </div>
+    <div class="flex justify-between pt-2">
+      ${x.id? `<button type="button" data-action="payment-delete" data-id="${x.id}" data-contract="${contractId}" class="btn btn-danger">Eliminar</button>`:'<span></span>'}
+      <div class="flex gap-2"><button type="button" data-action="modal-close" class="btn btn-outline">Cancelar</button><button type="submit" class="btn btn-primary">Guardar</button></div>
+    </div>
+  </form>`;
+}
+function svgBarChart(data, opts){
+  opts = opts || {};
+  const w = opts.width||560, h = opts.height||180, pad = 30;
+  const max = Math.max(1, ...data.map(d=>d.value));
+  const bw = (w-pad*2)/data.length;
+  const bars = data.map((d,i)=>{
+    const bh = Math.max(2,(d.value/max)*(h-pad*2));
+    const x = pad + i*bw + bw*0.15;
+    const y = h-pad-bh;
+    return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(bw*0.7).toFixed(1)}" height="${bh.toFixed(1)}" fill="${d.color||'#1e293b'}" rx="2"><title>${esc(d.label)}: ${fmtMoney(d.value)}</title></rect>
+      <text x="${(x+bw*0.35).toFixed(1)}" y="${h-pad+14}" font-size="9" fill="#64748b" text-anchor="middle">${esc(d.label)}</text>`;
+  }).join('');
+  return `<svg viewBox="0 0 ${w} ${h}" class="w-full h-auto">
+    <line x1="${pad}" y1="${h-pad}" x2="${w-pad}" y2="${h-pad}" stroke="#e2e8f0"/>
+    ${bars}
+  </svg>`;
+}
+function viewContractDetail(id){
+  const ct = contractById(id);
+  if(!ct) return `<p>Contrato no encontrado.</p>`;
+  const prop = propertyById(ct.propertyId);
+  let pays = paymentsOfContract(id);
+  if(paymentFilter.status) pays = pays.filter(p=>p.status===paymentFilter.status);
+  const stats = computeRentability(id);
+  const chartData = paymentsOfContract(id).slice(0,12).reverse().map(p=>({label:p.period.slice(5), value:p.status==='Cobrado'?Number(p.paidAmount||0):0, color: p.status==='Impago'?'#dc2626':(p.status==='Pendiente'?'#cbd5e1':'#1e293b')}));
+  return `
+  <a href="#/inmuebles/${prop?prop.id:''}" class="text-sm text-slate-500 hover:text-slate-800">&larr; ${esc(prop?prop.address:'Inmueble')}</a>
+  <div class="flex flex-wrap items-center justify-between gap-3 my-3">
+    <div>
+      <h1 class="text-xl font-bold text-slate-800">Contrato — ${esc(ct.tenant)}</h1>
+      <div class="text-sm text-slate-500 mt-1">${fmtDate(ct.startDate)} → ${fmtDate(ct.endDate)} · Renovación: ${fmtDate(ct.renewalDate)} ${ct.status==='Activo'?badge(urgency(ct.renewalDate||ct.endDate,false)):'<span class="badge badge-gray">Finalizado</span>'}</div>
+    </div>
+    <button data-action="contract-edit" data-id="${ct.id}" class="btn btn-outline">Editar contrato</button>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+    <div class="stat-tile"><div class="text-xs text-slate-500">Renta mensual</div><div class="text-lg font-bold">${fmtMoney(ct.rentAmount)}</div></div>
+    <div class="stat-tile"><div class="text-xs text-slate-500">Fianza</div><div class="text-lg font-bold">${fmtMoney(ct.deposit)}</div></div>
+    <div class="stat-tile"><div class="text-xs text-slate-500">Cobrado / Previsto</div><div class="text-lg font-bold">${fmtMoney(stats.cobrado)} <span class="text-xs text-slate-400 font-normal">/ ${fmtMoney(stats.previsto)}</span></div></div>
+    <div class="stat-tile"><div class="text-xs text-slate-500">% Rentabilidad cobro</div><div class="text-lg font-bold ${stats.rate<80?'text-red-600':'text-green-700'}">${stats.rate.toFixed(1)}%</div></div>
+  </div>
+
+  <div class="card p-4 mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div><div class="text-xs text-slate-500 mb-1">Gastos</div><div class="text-sm">${esc(ct.expenses)||'—'}</div></div>
+    <div><div class="text-xs text-slate-500 mb-1">Actualización IPC</div><div class="text-sm">${esc(ct.ipcNotes)||'—'}</div></div>
+    <div class="md:col-span-2"><div class="text-xs text-slate-500 mb-1">Notas</div><div class="text-sm whitespace-pre-line">${esc(ct.notes)||'—'}</div></div>
+  </div>
+
+  <div class="card p-4 mb-4">
+    <h2 class="font-bold text-sm mb-2">Ingresos mensuales (últimos periodos)</h2>
+    ${chartData.length===0? '<p class="text-sm text-slate-400">Sin histórico.</p>' : svgBarChart(chartData)}
+  </div>
+
+  <div class="card p-4">
+    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+      <h2 class="font-bold text-sm">Control de pagos</h2>
+      <div class="flex items-center gap-2">
+        <select id="paymentFStatus"><option value="">Todos los estados</option>${['Pendiente','Cobrado','Impago'].map(s=>`<option ${paymentFilter.status===s?'selected':''}>${s}</option>`).join('')}</select>
+        <button data-action="payment-new" data-contract="${ct.id}" class="btn btn-sm btn-outline">+ Registrar pago</button>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+    <table class="tbl">
+      <thead><tr><th>Periodo</th><th>Previsto</th><th>F. prevista</th><th>Cobrado</th><th>F. real</th><th>Método</th><th>Estado</th><th></th></tr></thead>
+      <tbody>
+        ${pays.length===0?`<tr><td colspan="8" class="text-center text-slate-400 py-6">Sin pagos</td></tr>`:pays.map(p=>`
+          <tr>
+            <td class="font-medium">${esc(p.period)}</td>
+            <td>${fmtMoney(p.expectedAmount)}</td>
+            <td>${fmtDate(p.expectedDate)}</td>
+            <td>${p.status==='Cobrado'?fmtMoney(p.paidAmount):'—'}</td>
+            <td>${p.paidDate?fmtDate(p.paidDate):'—'}</td>
+            <td>${esc(p.method)||'—'}</td>
+            <td><span class="badge ${p.status==='Cobrado'?'badge-green':p.status==='Impago'?'badge-red':'badge-yellow'}">${esc(p.status)}</span></td>
+            <td class="text-right"><button data-action="payment-edit" data-id="${p.id}" data-contract="${ct.id}" class="btn btn-outline btn-sm">Editar</button></td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+    </div>
+  </div>
+  `;
+}
+
+/* =========================================================
+   VISTA: CALENDARIO
+========================================================= */
+let calMonth = todayISO().slice(0,7);
+function viewCalendar(){
+  const [y,m] = calMonth.split('-').map(Number);
+  const first = new Date(y, m-1, 1);
+  const startOffset = (first.getDay()+6)%7; // lunes=0
+  const daysInMonth = new Date(y, m, 0).getDate();
+  const monthNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+  const dayItems = {};
+  function push(dateStr, item){ if(!dateStr) return; (dayItems[dateStr] = dayItems[dateStr]||[]).push(item); }
+  state.cases.forEach(c=>(c.milestones||[]).forEach(ms=>{ if(!ms.done) push(ms.dueDate, {label:`${c.ref}: ${ms.title}`, type:'exp', link:`#/expedientes/${c.id}`}); }));
+  state.contracts.forEach(ct=>{ if(ct.status==='Activo') push(ct.renewalDate||ct.endDate, {label:`Vence: ${ct.tenant}`, type:'alq', link:`#/contratos/${ct.id}`}); });
+  state.events.forEach(ev=> push(ev.date, {label:ev.title, type:'manual', id: ev.id}));
+
+  let cells = '';
+  for(let i=0;i<startOffset;i++) cells += `<div class="border border-slate-100 bg-slate-50 min-h-[90px]"></div>`;
+  for(let d=1; d<=daysInMonth; d++){
+    const dateStr = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const items = dayItems[dateStr]||[];
+    const isToday = dateStr===todayISO();
+    cells += `<div class="border border-slate-100 min-h-[90px] p-1 align-top ${isToday?'bg-yellow-50':'bg-white'}">
+      <div class="text-xs font-semibold ${isToday?'text-[#b8860b]':'text-slate-500'} mb-1">${d}</div>
+      <div class="space-y-0.5">
+        ${items.slice(0,3).map(it=>{
+          const color = it.type==='exp'?'badge-blue':it.type==='alq'?'badge-yellow':'badge-gray';
+          const inner = `<span class="badge ${color} !block truncate text-left">${esc(it.label)}</span>`;
+          return it.link? `<a href="${it.link}">${inner}</a>` : `<div class="group relative">${inner}${it.id?`<button data-action="event-delete" data-id="${it.id}" class="hidden group-hover:inline text-red-400 text-xs ml-1">✕</button>`:''}</div>`;
+        }).join('')}
+        ${items.length>3?`<div class="text-[10px] text-slate-400">+${items.length-3} más</div>`:''}
+      </div>
+    </div>`;
+  }
+
+  return `
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+    <h1 class="text-xl font-bold text-slate-800">Calendario</h1>
+    <div class="flex items-center gap-2">
+      <button data-action="cal-prev" class="btn btn-outline btn-sm">&larr;</button>
+      <span class="font-semibold text-sm w-32 text-center">${monthNames[m-1]} ${y}</span>
+      <button data-action="cal-next" class="btn btn-outline btn-sm">&rarr;</button>
+      <button data-action="cal-today" class="btn btn-outline btn-sm">Hoy</button>
+      <button data-action="event-new" class="btn btn-primary btn-sm">+ Evento</button>
+    </div>
+  </div>
+  <div class="flex gap-3 mb-3 text-xs">
+    <span class="badge badge-blue">Expediente</span><span class="badge badge-yellow">Alquiler</span><span class="badge badge-gray">Evento manual</span>
+  </div>
+  <div class="grid grid-cols-7 text-center text-xs font-semibold text-slate-500 mb-1">
+    ${['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(d=>`<div>${d}</div>`).join('')}
+  </div>
+  <div class="grid grid-cols-7 gap-px bg-slate-100 border border-slate-100 rounded-lg overflow-hidden">${cells}</div>
+  `;
+}
+function eventForm(ev){
+  const x = ev || {date: todayISO(), title:'', notes:''};
+  return `
+  <form data-form="event" data-id="${x.id||''}" class="space-y-3">
+    <div><label class="field-label">Título *</label><input type="text" name="title" required value="${esc(x.title)}"></div>
+    <div><label class="field-label">Fecha *</label><input type="date" name="date" required value="${esc(x.date)}"></div>
+    <div><label class="field-label">Notas</label><textarea name="notes" rows="3">${esc(x.notes)}</textarea></div>
+    <div class="flex justify-end gap-2 pt-2"><button type="button" data-action="modal-close" class="btn btn-outline">Cancelar</button><button type="submit" class="btn btn-primary">Guardar</button></div>
+  </form>`;
+}
+
+/* =========================================================
+   VISTA: DOCUMENTOS
+========================================================= */
+function relatedLabel(type, relId){
+  if(type==='client') return clientName(relId);
+  if(type==='case'){ const c = caseById(relId); return c? c.ref : '—'; }
+  if(type==='property') return propertyLabel(relId);
+  return '—';
+}
+function relatedLink(type, relId){
+  if(type==='client') return `#/clientes/${relId}`;
+  if(type==='case') return `#/expedientes/${relId}`;
+  if(type==='property') return `#/inmuebles/${relId}`;
+  return '#';
+}
+function viewDocuments(){
+  const docs = state.documents.slice().sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
+  return `
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+    <h1 class="text-xl font-bold text-slate-800">Documentos</h1>
+    <button data-action="document-new" class="btn btn-primary">+ Nuevo documento</button>
+  </div>
+  <p class="text-xs text-slate-400 mb-3">Enlaces o referencias a documentos (sin backend no hay subida real de archivos).</p>
+  <div class="card overflow-x-auto">
+    <table class="tbl">
+      <thead><tr><th>Nombre</th><th>Relacionado con</th><th>Enlace</th><th>Fecha</th><th></th></tr></thead>
+      <tbody>
+        ${docs.length===0?`<tr><td colspan="5" class="text-center text-slate-400 py-6">Sin documentos</td></tr>`:docs.map(d=>`
+        <tr>
+          <td class="font-medium">${esc(d.name)}</td>
+          <td><a href="${relatedLink(d.relatedType,d.relatedId)}" class="text-[#b8860b] hover:underline">${d.relatedType==='client'?'👤':d.relatedType==='case'?'📁':'🏢'} ${esc(relatedLabel(d.relatedType,d.relatedId))}</a></td>
+          <td><a href="${esc(d.url)}" target="_blank" class="text-blue-600 hover:underline truncate inline-block max-w-[220px] align-bottom">${esc(d.url)}</a></td>
+          <td>${fmtDate(d.createdAt)}</td>
+          <td class="text-right"><button data-action="document-delete" data-id="${d.id}" class="btn btn-danger btn-sm">Eliminar</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+function documentForm(presetType, presetRelated){
+  return `
+  <form data-form="document" class="space-y-3">
+    <div><label class="field-label">Nombre del documento *</label><input type="text" name="name" required></div>
+    <div class="grid grid-cols-2 gap-3">
+      <div><label class="field-label">Tipo relacionado</label>
+        <select name="relatedType" id="docRelType">
+          <option value="client" ${presetType==='client'?'selected':''}>Cliente</option>
+          <option value="case" ${presetType==='case'?'selected':''}>Expediente</option>
+          <option value="property" ${presetType==='property'?'selected':''}>Inmueble</option>
+        </select>
+      </div>
+      <div><label class="field-label">Elemento</label><select name="relatedId" id="docRelId"></select></div>
+    </div>
+    <div><label class="field-label">URL / enlace *</label><input type="text" name="url" required placeholder="https://..."></div>
+    <div><label class="field-label">Notas</label><textarea name="notes" rows="2"></textarea></div>
+    <div class="flex justify-end gap-2 pt-2"><button type="button" data-action="modal-close" class="btn btn-outline">Cancelar</button><button type="submit" class="btn btn-primary">Guardar</button></div>
+  </form>`;
+}
+function wireDocumentForm(box, presetType, presetRelated){
+  const options = { client: state.clients.map(c=>({id:c.id,label:c.name})), case: state.cases.map(c=>({id:c.id,label:c.ref})), property: state.properties.map(p=>({id:p.id,label:p.address})) };
+  const typeSel = $('#docRelType', box), idSel = $('#docRelId', box);
+  function refresh(){ idSel.innerHTML = options[typeSel.value].map(o=>`<option value="${o.id}">${esc(o.label)}</option>`).join(''); if(presetRelated) idSel.value = presetRelated; }
+  typeSel.addEventListener('change', refresh);
+  refresh();
+}
+
+/* =========================================================
+   VISTA: REPORTES
+========================================================= */
+function viewReports(){
+  const byStatus = {};
+  state.pipelineStages.forEach(s=>byStatus[s]=0);
+  state.cases.forEach(c=>byStatus[c.status]=(byStatus[c.status]||0)+1);
+
+  const byType = {};
+  state.cases.forEach(c=>byType[c.matterType]=(byType[c.matterType]||0)+1);
+
+  const incomeByClientMonth = {};
+  state.payments.forEach(p=>{
+    if(p.status!=='Cobrado') return;
+    const ct = contractById(p.contractId); if(!ct) return;
+    const prop = propertyById(ct.propertyId); if(!prop) return;
+    const client = clientName(prop.clientId);
+    incomeByClientMonth[client] = incomeByClientMonth[client] || {};
+    incomeByClientMonth[client][p.period] = (incomeByClientMonth[client][p.period]||0) + Number(p.paidAmount||0);
+  });
+
+  const unpaid = state.payments.filter(p=>p.status==='Impago').map(p=>{
+    const ct = contractById(p.contractId);
+    const prop = ct? propertyById(ct.propertyId): null;
+    return {...p, tenant: ct?ct.tenant:'—', property: prop?prop.address:'—'};
+  });
+  const totalUnpaid = unpaid.reduce((s,p)=>s+Number(p.expectedAmount||0),0);
+
+  const last6 = [];
+  for(let i=5;i>=0;i--){ last6.push(addMonthsStr(-i).slice(0,7)); }
+  const incomeSeries = last6.map(period=>({label:period.slice(5), value: state.payments.filter(p=>p.period===period && p.status==='Cobrado').reduce((s,p)=>s+Number(p.paidAmount||0),0)}));
+
+  return `
+  <h1 class="text-xl font-bold text-slate-800 mb-4">Reportes</h1>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+    <div class="card p-4">
+      <h2 class="font-bold text-sm mb-2">Expedientes por estado</h2>
+      <table class="tbl"><tbody>${Object.entries(byStatus).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="text-right font-semibold">${v}</td></tr>`).join('')}</tbody></table>
+    </div>
+    <div class="card p-4">
+      <h2 class="font-bold text-sm mb-2">Expedientes por tipo de asunto</h2>
+      <table class="tbl"><tbody>${Object.entries(byType).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="text-right font-semibold">${v}</td></tr>`).join('')}</tbody></table>
+    </div>
+  </div>
+
+  <div class="card p-4 mb-4">
+    <h2 class="font-bold text-sm mb-2">Ingresos totales de alquiler (últimos 6 meses)</h2>
+    ${svgBarChart(incomeSeries)}
+  </div>
+
+  <div class="card p-4 mb-4 overflow-x-auto">
+    <h2 class="font-bold text-sm mb-2">Ingresos de alquiler por cliente / mes</h2>
+    <table class="tbl">
+      <thead><tr><th>Cliente</th>${last6.map(m=>`<th>${m.slice(5)}/${m.slice(2,4)}</th>`).join('')}<th>Total</th></tr></thead>
+      <tbody>
+        ${Object.keys(incomeByClientMonth).length===0?`<tr><td colspan="${last6.length+2}" class="text-center text-slate-400 py-4">Sin datos</td></tr>`:Object.entries(incomeByClientMonth).map(([client,months])=>{
+          const total = last6.reduce((s,m)=>s+(months[m]||0),0);
+          return `<tr><td class="font-medium">${esc(client)}</td>${last6.map(m=>`<td>${months[m]?fmtMoney(months[m]):'—'}</td>`).join('')}<td class="font-semibold">${fmtMoney(total)}</td></tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card p-4">
+    <h2 class="font-bold text-sm mb-2">Impagos acumulados <span class="text-red-600">(${fmtMoney(totalUnpaid)})</span></h2>
+    <table class="tbl">
+      <thead><tr><th>Periodo</th><th>Inmueble</th><th>Arrendatario</th><th>Importe</th><th>Notas</th></tr></thead>
+      <tbody>
+        ${unpaid.length===0?`<tr><td colspan="5" class="text-center text-slate-400 py-4">Sin impagos registrados</td></tr>`:unpaid.map(p=>`
+          <tr><td>${esc(p.period)}</td><td>${esc(p.property)}</td><td>${esc(p.tenant)}</td><td class="text-red-600 font-semibold">${fmtMoney(p.expectedAmount)}</td><td class="text-slate-500">${esc(p.notes)}</td></tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+  `;
+}
+
+/* =========================================================
+   VISTA: AJUSTES
+========================================================= */
+function viewSettings(){
+  return `
+  <h1 class="text-xl font-bold text-slate-800 mb-4">Ajustes</h1>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+    ${configListCard('Tipos de asunto', 'matterTypes')}
+    ${configListCard('Etapas del pipeline', 'pipelineStages')}
+    ${configListCard('Abogados', 'lawyers')}
+  </div>
+  <div class="card p-4">
+    <h2 class="font-bold text-sm mb-2">Copia de seguridad</h2>
+    <p class="text-sm text-slate-500 mb-3">Exporta todos los datos a un archivo JSON, o importa un backup previo para restaurarlos (sustituye los datos actuales).</p>
+    <div class="flex gap-2">
+      <button data-action="backup-export" class="btn btn-primary">Exportar backup (JSON)</button>
+      <button data-action="backup-import" class="btn btn-outline">Importar backup (JSON)</button>
+      <button data-action="seed-reset" class="btn btn-danger">Vaciar datos de ejemplo</button>
+    </div>
+  </div>
+  `;
+}
+function configListCard(title, key){
+  return `<div class="card p-4">
+    <h2 class="font-bold text-sm mb-2">${esc(title)}</h2>
+    <div class="space-y-1 mb-2">
+      ${state[key].map((v,i)=>`<div class="flex items-center justify-between text-sm border-b border-slate-50 py-1">
+        <span>${esc(v)}</span><button data-action="config-remove" data-key="${key}" data-idx="${i}" class="text-slate-300 hover:text-red-500 text-lg leading-none">&times;</button>
+      </div>`).join('')}
+    </div>
+    <form data-form="config-add" data-key="${key}" class="flex gap-1">
+      <input type="text" name="value" placeholder="Añadir..." class="text-xs">
+      <button type="submit" class="btn btn-outline btn-sm">+</button>
+    </form>
+  </div>`;
+}
+
+/* =========================================================
+   ACCIONES (delegación de eventos)
+========================================================= */
+const Actions = {
+  'modal-close': ()=>closeModal(),
+
+  'client-new': ()=> openModal('Nuevo cliente', clientForm()),
+  'client-edit': (id)=> openModal('Editar cliente', clientForm(clientById(id))),
+  'client-delete': (id)=>{
+    if(!confirmAction('¿Eliminar este cliente? También se perderá su vínculo con expedientes e inmuebles asociados.')) return;
+    mutate(s=>{ s.clients = s.clients.filter(c=>c.id!==id); });
+    closeModal(); toast('Cliente eliminado'); location.hash = '#/clientes';
+  },
+
+  'case-new': (_, target)=> openModal('Nuevo expediente', caseForm(null, target && target.dataset.client)),
+  'case-edit': (id)=> openModal('Editar expediente', caseForm(caseById(id))),
+  'case-delete': (id)=>{
+    if(!confirmAction('¿Eliminar este expediente?')) return;
+    mutate(s=>{ s.cases = s.cases.filter(c=>c.id!==id); });
+    closeModal(); toast('Expediente eliminado'); location.hash = '#/expedientes';
+  },
+  'case-view-kanban': ()=>{ caseViewMode='kanban'; render(); },
+  'case-view-list': ()=>{ caseViewMode='list'; render(); },
+  'case-filter-clear': ()=>{ caseFilter = {q:'', client:'', status:'', lawyer:'', matter:''}; render(); },
+
+  'milestone-new': (_, target)=>{
+    const caseId = target.dataset.case;
+    openModal('Nuevo hito', `
+      <form data-form="milestone" data-case="${caseId}" class="space-y-3">
+        <div><label class="field-label">Título *</label><input type="text" name="title" required></div>
+        <div><label class="field-label">Fecha límite *</label><input type="date" name="dueDate" required value="${todayISO()}"></div>
+        <div class="flex justify-end gap-2 pt-2"><button type="button" data-action="modal-close" class="btn btn-outline">Cancelar</button><button type="submit" class="btn btn-primary">Guardar</button></div>
+      </form>`);
+  },
+  'milestone-toggle': (_, target)=>{
+    const caseId = target.dataset.case, msId = target.dataset.id;
+    mutate(s=>{ const cs = s.cases.find(x=>x.id===caseId); const m = cs.milestones.find(x=>x.id===msId); m.done = target.checked; });
+  },
+  'milestone-delete': (_, target)=>{
+    const caseId = target.dataset.case, msId = target.dataset.id;
+    if(!confirmAction('¿Eliminar este hito?')) return;
+    mutate(s=>{ const cs = s.cases.find(x=>x.id===caseId); cs.milestones = cs.milestones.filter(m=>m.id!==msId); });
+  },
+  'log-new': (_, target)=>{
+    const caseId = target.dataset.case;
+    openModal('Nueva actuación', `
+      <form data-form="log" data-case="${caseId}" class="space-y-3">
+        <div><label class="field-label">Fecha *</label><input type="date" name="date" required value="${todayISO()}"></div>
+        <div><label class="field-label">Descripción *</label><textarea name="text" rows="3" required></textarea></div>
+        <div class="flex justify-end gap-2 pt-2"><button type="button" data-action="modal-close" class="btn btn-outline">Cancelar</button><button type="submit" class="btn btn-primary">Guardar</button></div>
+      </form>`);
+  },
+  'log-delete': (_, target)=>{
+    const caseId = target.dataset.case, logId = target.dataset.id;
+    if(!confirmAction('¿Eliminar esta actuación?')) return;
+    mutate(s=>{ const cs = s.cases.find(x=>x.id===caseId); cs.log = cs.log.filter(l=>l.id!==logId); });
+  },
+
+  'property-view-list': ()=>{ propertyViewMode='list'; render(); },
+  'property-view-finance': ()=>{ propertyViewMode='finance'; render(); },
+  'finance-filter-clear': ()=>{ financeFilter = {client:'', property:'', status:'', period:''}; render(); },
+  'property-filter-clear': ()=>{ propertyFilter = {q:'', client:''}; render(); },
+
+  'property-new': (_, target)=> openModal('Nuevo inmueble', propertyForm(null, target && target.dataset.client)),
+  'property-edit': (id)=> openModal('Editar inmueble', propertyForm(propertyById(id))),
+  'property-delete': (id)=>{
+    if(!confirmAction('¿Eliminar este inmueble? Se eliminarán también sus contratos y pagos asociados.')) return;
+    mutate(s=>{
+      const contractIds = s.contracts.filter(c=>c.propertyId===id).map(c=>c.id);
+      s.payments = s.payments.filter(p=>!contractIds.includes(p.contractId));
+      s.contracts = s.contracts.filter(c=>c.propertyId!==id);
+      s.properties = s.properties.filter(p=>p.id!==id);
+    });
+    closeModal(); toast('Inmueble eliminado'); location.hash = '#/inmuebles';
+  },
+
+  'contract-new': (_, target)=> openModal('Nuevo contrato', contractForm(null, target.dataset.property)),
+  'contract-edit': (id)=> openModal('Editar contrato', contractForm(contractById(id))),
+  'contract-delete': (id)=>{
+    if(!confirmAction('¿Eliminar este contrato y su histórico de pagos?')) return;
+    const ct = contractById(id); const propId = ct ? ct.propertyId : null;
+    mutate(s=>{ s.payments = s.payments.filter(p=>p.contractId!==id); s.contracts = s.contracts.filter(c=>c.id!==id); });
+    closeModal(); toast('Contrato eliminado'); location.hash = propId? `#/inmuebles/${propId}` : '#/inmuebles';
+  },
+
+  'payment-new': (_, target)=> openModal('Registrar pago', paymentForm(null, target.dataset.contract)),
+  'payment-edit': (id, target)=> openModal('Editar pago', paymentForm(state.payments.find(p=>p.id===id), target.dataset.contract)),
+  'payment-delete': (id, target)=>{
+    if(!confirmAction('¿Eliminar este registro de pago?')) return;
+    mutate(s=>{ s.payments = s.payments.filter(p=>p.id!==id); });
+    closeModal(); toast('Pago eliminado');
+  },
+
+  'event-new': ()=> openModal('Nuevo evento', eventForm()),
+  'event-delete': (id)=>{
+    if(!confirmAction('¿Eliminar este evento?')) return;
+    mutate(s=>{ s.events = s.events.filter(e=>e.id!==id); });
+  },
+  'cal-prev': ()=>{ const [y,m]=calMonth.split('-').map(Number); const d=new Date(y,m-2,1); calMonth = d.toISOString().slice(0,7); render(); },
+  'cal-next': ()=>{ const [y,m]=calMonth.split('-').map(Number); const d=new Date(y,m,1); calMonth = d.toISOString().slice(0,7); render(); },
+  'cal-today': ()=>{ calMonth = todayISO().slice(0,7); render(); },
+
+  'document-new': (_, target)=>{
+    const type = (target.dataset.type)||'client';
+    const related = target.dataset.related || '';
+    openModal('Nuevo documento', documentForm(type, related), { onMount: (box)=> wireDocumentForm(box, type, related) });
+  },
+  'document-delete': (id)=>{
+    if(!confirmAction('¿Eliminar este documento?')) return;
+    mutate(s=>{ s.documents = s.documents.filter(d=>d.id!==id); });
+  },
+
+  'config-remove': (_, target)=>{
+    const key = target.dataset.key, idx = Number(target.dataset.idx);
+    mutate(s=>{ s[key].splice(idx,1); });
+  },
+
+  'backup-export': ()=>{ DB.exportJSON(state); toast('Backup descargado'); },
+  'backup-import': ()=> $('#importFile').click(),
+
+  'seed-reset': ()=>{
+    if(!confirmAction('Esto sustituirá TODOS los datos actuales por los datos de ejemplo. ¿Continuar?')) return;
+    state = DB.seed(); persist(); location.hash = '#/dashboard'; render(); toast('Datos de ejemplo restaurados');
+  },
+};
+
+document.addEventListener('click', (e)=>{
+  const target = e.target.closest('[data-action]');
+  if(!target) return;
+  const action = target.dataset.action;
+  if(Actions[action]){ e.preventDefault(); Actions[action](target.dataset.id, target); }
+});
+
+/* Kanban drag & drop (delegated) */
+let draggedCaseId = null;
+document.addEventListener('dragstart', (e)=>{
+  const card = e.target.closest('.kanban-card');
+  if(!card) return;
+  draggedCaseId = card.dataset.caseid;
+  card.classList.add('dragging');
+});
+document.addEventListener('dragend', (e)=>{
+  const card = e.target.closest('.kanban-card');
+  if(card) card.classList.remove('dragging');
+  $$('.kanban-col').forEach(c=>c.classList.remove('drag-over'));
+});
+document.addEventListener('dragover', (e)=>{
+  const zone = e.target.closest('.kanban-dropzone');
+  if(!zone) return;
+  e.preventDefault();
+  zone.closest('.kanban-col').classList.add('drag-over');
+});
+document.addEventListener('dragleave', (e)=>{
+  const zone = e.target.closest('.kanban-dropzone');
+  if(zone) zone.closest('.kanban-col').classList.remove('drag-over');
+});
+document.addEventListener('drop', (e)=>{
+  const zone = e.target.closest('.kanban-dropzone');
+  if(!zone || !draggedCaseId) return;
+  e.preventDefault();
+  const newStatus = zone.dataset.status;
+  mutate(s=>{ const c = s.cases.find(x=>x.id===draggedCaseId); if(c) c.status = newStatus; });
+  draggedCaseId = null;
+});
+
+/* Formularios (delegación submit) */
+document.addEventListener('submit', (e)=>{
+  const form = e.target.closest('form[data-form]');
+  if(!form) return;
+  e.preventDefault();
+  const type = form.dataset.form;
+  const fd = new FormData(form);
+  const data = Object.fromEntries(fd.entries());
+
+  if(type==='client'){
+    const id = form.dataset.id;
+    mutate(s=>{
+      if(id){ Object.assign(s.clients.find(c=>c.id===id), data); }
+      else { s.clients.push({id: uid(), ...data}); }
+    });
+    closeModal(); toast('Cliente guardado');
+  }
+  else if(type==='case'){
+    const id = form.dataset.id;
+    data.fees = Number(data.fees)||0;
+    mutate(s=>{
+      if(id){ Object.assign(s.cases.find(c=>c.id===id), data); }
+      else { s.cases.push({id: uid(), milestones:[], log:[], ...data}); }
+    });
+    closeModal(); toast('Expediente guardado');
+  }
+  else if(type==='milestone'){
+    const caseId = form.dataset.case;
+    mutate(s=>{ s.cases.find(c=>c.id===caseId).milestones.push({id: uid(), title:data.title, dueDate:data.dueDate, done:false}); });
+    closeModal();
+  }
+  else if(type==='log'){
+    const caseId = form.dataset.case;
+    mutate(s=>{ s.cases.find(c=>c.id===caseId).log.push({id: uid(), date:data.date, text:data.text}); });
+    closeModal();
+  }
+  else if(type==='property'){
+    const id = form.dataset.id;
+    data.area = data.area? Number(data.area): '';
+    mutate(s=>{
+      if(id){ Object.assign(s.properties.find(p=>p.id===id), data); }
+      else { s.properties.push({id: uid(), ...data}); }
+    });
+    closeModal(); toast('Inmueble guardado');
+  }
+  else if(type==='contract'){
+    const id = form.dataset.id;
+    data.rentAmount = Number(data.rentAmount)||0;
+    data.deposit = Number(data.deposit)||0;
+    mutate(s=>{
+      if(id){ Object.assign(s.contracts.find(c=>c.id===id), data); }
+      else { s.contracts.push({id: uid(), ...data}); }
+    });
+    closeModal(); toast('Contrato guardado');
+  }
+  else if(type==='payment'){
+    const id = form.dataset.id;
+    const contractId = form.dataset.contract;
+    data.expectedAmount = Number(data.expectedAmount)||0;
+    data.paidAmount = Number(data.paidAmount)||0;
+    mutate(s=>{
+      if(id){ Object.assign(s.payments.find(p=>p.id===id), data); }
+      else { s.payments.push({id: uid(), contractId, ...data}); }
+    });
+    closeModal(); toast('Pago guardado');
+  }
+  else if(type==='event'){
+    const id = form.dataset.id;
+    mutate(s=>{
+      if(id){ Object.assign(s.events.find(ev=>ev.id===id), data); }
+      else { s.events.push({id: uid(), ...data}); }
+    });
+    closeModal(); toast('Evento guardado');
+  }
+  else if(type==='document'){
+    mutate(s=>{ s.documents.push({id: uid(), name:data.name, relatedType:data.relatedType, relatedId:data.relatedId, url:data.url, notes:data.notes||'', createdAt: todayISO()}); });
+    closeModal(); toast('Documento guardado');
+  }
+  else if(type==='config-add'){
+    const key = form.dataset.key;
+    const val = (data.value||'').trim();
+    if(val){ mutate(s=>{ if(!s[key].includes(val)) s[key].push(val); }); }
+    form.reset();
+  }
+});
+
+/* Inputs con debounce (búsquedas y filtros) — delegado por 'input'/'change' */
+document.addEventListener('input', (e)=>{
+  if(e.target.id==='clientSearch'){ clientFilter.q = e.target.value; renderPreserveFocus('clientSearch', viewClientsList); }
+  if(e.target.id==='propertySearch'){ propertyFilter.q = e.target.value; renderPreserveFocus('propertySearch', viewPropertiesList); }
+  if(e.target.id==='propertyFClient'){ propertyFilter.client = e.target.value; render(); }
+  if(e.target.id==='caseSearch'){ caseFilter.q = e.target.value; renderPreserveFocus('caseSearch', ()=>render()); }
+});
+document.addEventListener('change', (e)=>{
+  if(e.target.id==='caseFClient'){ caseFilter.client = e.target.value; render(); }
+  if(e.target.id==='caseFStatus'){ caseFilter.status = e.target.value; render(); }
+  if(e.target.id==='caseFLawyer'){ caseFilter.lawyer = e.target.value; render(); }
+  if(e.target.id==='caseFMatter'){ caseFilter.matter = e.target.value; render(); }
+  if(e.target.id==='paymentFStatus'){ paymentFilter.status = e.target.value; render(); }
+  if(e.target.id==='finFClient'){ financeFilter.client = e.target.value; render(); }
+  if(e.target.id==='finFProperty'){ financeFilter.property = e.target.value; render(); }
+  if(e.target.id==='finFStatus'){ financeFilter.status = e.target.value; render(); }
+  if(e.target.id==='finFPeriod'){ financeFilter.period = e.target.value; render(); }
+  if(e.target.id==='importFile'){ handleImportFile(e.target.files[0]); }
+});
+function renderPreserveFocus(inputId, renderFn){
+  const app = $('#app');
+  app.innerHTML = renderFn();
+  afterRenderHooks();
+  const input = document.getElementById(inputId);
+  if(input){ input.focus(); const v=input.value; input.value=''; input.value=v; }
+}
+
+function handleImportFile(file){
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const parsed = JSON.parse(reader.result);
+      if(!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.clients)){
+        throw new Error('El archivo no tiene el formato esperado.');
+      }
+      if(!confirmAction('Esto sustituirá todos los datos actuales por los del archivo importado. ¿Continuar?')) return;
+      state = Object.assign(DB.empty(), parsed);
+      persist();
+      location.hash = '#/dashboard';
+      render();
+      toast('Backup importado correctamente');
+    }catch(err){
+      alert('No se pudo importar el archivo: '+err.message);
+    }finally{
+      $('#importFile').value = '';
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* Sidebar móvil */
+$('#btnBurger').addEventListener('click', ()=> $('#sidebar').classList.toggle('-translate-x-full'));
+
+/* Init */
+window.addEventListener('hashchange', route);
+if(!location.hash) location.hash = '#/dashboard';
+route();
+if(freshInstall) toast('Datos de ejemplo cargados. Puedes vaciarlos desde el menú lateral.');
+
+})();
+</script>
+</body>
+</html>
